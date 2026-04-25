@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Selfa SFH Hybrid Inverter",
+        "description": "Connect to the inverter via Modbus TCP",
+        "data": {
+          "host": "Host (IP address)",
+          "port": "Port",
+          "slave_id": "Slave ID",
+          "protocol": "Protocol",
+          "scan_interval": "Scan interval (seconds)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to the inverter. Check host, port and firewall.",
+      "cannot_read": "Connected but failed to read registers. Check Slave ID and protocol."
+    },
+    "abort": {
+      "already_configured": "This inverter is already configured."
+    }
+  }
+}
