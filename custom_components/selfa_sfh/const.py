@@ -152,16 +152,78 @@ REG_GRID_INJ_SWITCH    = 0x0076   # Grid Injection Power Limit Switch (0=OFF, 1=
 REG_GRID_INJ_LIMIT     = 0x0077   # Grid Injection Power Limit Setting
 REG_SMART_METER_STATUS = 0x0078   # Smart Meter COM Status (0=abnormal, 1=normal)
 
-# Power scheduling (EMS)
-REG_WORKING_MODE       = 0xC350   # Hybrid Inverter Working Mode Setting (50000)
-REG_EMS_AC_CTRL_TOTAL  = 0xC4CA   # EMS AC Ctrl: Total Power Scheduling Setting (50378)
-REG_EMS_AC_CTRL_A      = 0xC4CB   # EMS AC Ctrl: Phase A Power Scheduling Setting
-REG_EMS_AC_CTRL_B      = 0xC4CC   # EMS AC Ctrl: Phase B Power Scheduling Setting
-REG_EMS_AC_CTRL_C      = 0xC4CD   # EMS AC Ctrl: Phase C Power Scheduling Setting
-REG_EMS_GENERAL_MODE   = 0xC4CE   # EMS General Mode (50382)
-REG_EMS_BATT_CHG       = 0xC4CF   # EMS Batt Ctrl: Battery Charge Set Pbat
-REG_EMS_BATT_DCHG      = 0xC4D3   # EMS Batt Ctrl: Battery Discharge Set Pbat
-REG_EMS_OFF_GRID_MODE  = 0xC4D3   # EMS Off-Grid Mode PV Power Scheduling (50211)
+# ─────────────────────────────────────────────
+# EMS — Working Mode & base
+# ─────────────────────────────────────────────
+REG_WORKING_MODE       = 0xC350   # 50000 – Hybrid Inverter Working Mode Setting (RW)
+
+# ── EMS_ACCtrlMode (Application 1) — registers 50202–50206 ──────────────────
+# Total AC power scheduling (I32, W, signed)
+REG_EMS_AC_CTRL_TOTAL  = 0xC4CA   # 50378 – Total AC Power Scheduling (I32, kW×10)
+REG_EMS_AC_CTRL_A      = 0xC4CB   # 50379 – Phase A Power Scheduling (I32, kW×10)
+REG_EMS_AC_CTRL_B      = 0xC4CC   # 50380 – Phase B Power Scheduling (I32, kW×10)
+REG_EMS_AC_CTRL_C      = 0xC4CD   # 50381 – Phase C Power Scheduling (I32, kW×10)
+
+# ── EMS_GeneralMode (Application 2) — register 50206 ────────────────────────
+REG_EMS_GENERAL_MODE   = 0xC4CE   # 50382 – EMS General Mode power target (I32, kW×10)
+
+# ── EMS_BattCtrlMode (Application 3) — registers 50207–50210 ────────────────
+# Battery Charge control
+REG_EMS_BAT_CHG_PBAT      = 0xC4CF   # 50383 – Battery Charge: Set Pbat (I32, kW×10, negative=charge)
+REG_EMS_BAT_CHG_UP_LIMIT  = 0xC4D1   # 50385 – Battery Charge: Set PupLimit (kW×10)
+REG_EMS_BAT_CHG_LOW_LIMIT = 0xC4D2   # 50386 – Battery Charge: Set PlowerLimit (kW×10)
+# Battery Discharge control
+REG_EMS_BAT_DCHG_PBAT     = 0xC4D3   # 50387 – Battery Discharge: Set Pbat (I32, kW×10)
+REG_EMS_BAT_DCHG_UP_LIMIT = 0xC4D5   # 50389 – Battery Discharge: Set PupLimit (kW×10)
+REG_EMS_BAT_DCHG_LOW_LIM  = 0xC4D6   # 50390 – Battery Discharge: Set PlowerLimit (kW×10)
+# Battery Force Charge
+REG_EMS_BAT_FORCE_CHG_PBAT    = 0xC4D7   # 50391 – Force Charge: Set Pbat
+REG_EMS_BAT_FORCE_CHG_UP      = 0xC4D9   # 50393 – Force Charge: Set PupLimit
+REG_EMS_BAT_FORCE_CHG_LOW     = 0xC4DA   # 50394 – Force Charge: Set PlowerLimit
+# Battery Force Discharge
+REG_EMS_BAT_FORCE_DCHG_PBAT   = 0xC4DB   # 50395 – Force Discharge: Set Pbat
+REG_EMS_BAT_FORCE_DCHG_UP     = 0xC4DD   # 50397 – Force Discharge: Set PupLimit
+REG_EMS_BAT_FORCE_DCHG_LOW    = 0xC4DE   # 50398 – Force Discharge: Set PlowerLimit
+
+# ── EMS_OffGridMode (Application 4) — register 50211 ────────────────────────
+REG_EMS_OFF_GRID_PV_POWER = 0xC4D3   # 50211 – Off-Grid PV Power Scheduling (Set Ppv)
+
+# ── Smart Meter write registers (EMS keepalive, period Tm) ──────────────────
+# Write every Tm seconds (1s ≤ Tm ≤ 30s) to keep EMS active
+REG_EMS_METER_START    = 0x6228   # 25128 – Smart meter data block start
+REG_EMS_METER_P_A      = 0x6228   # 25128 – Phase A power (I32, W)
+REG_EMS_METER_P_B      = 0x622A   # 25130 – Phase B power (I32, W)
+REG_EMS_METER_P_C      = 0x622C   # 25132 – Phase C power (I32, W)
+REG_EMS_METER_P_TOTAL  = 0x622E   # 25134 – Total power (I32, W)
+
+# ── BMS write registers (EMS keepalive, period Tb) ───────────────────────────
+# Write every Tb seconds (1s ≤ Tb ≤ 30s)
+REG_EMS_BMS_START      = 0xD0EC   # 53484 – BMS data block start
+REG_EMS_BMS_SOC        = 0xD0EC   # 53484 – SOC (U16, %)
+REG_EMS_BMS_SOH        = 0xD0ED   # 53485 – SOH (U16, %)
+REG_EMS_BMS_STATUS     = 0xD0EE   # 53486 – BMS Status
+REG_EMS_BMS_CHGV_LIM   = 0xD0EF   # 53487 – Charge Volt Limit (U16, V×10)
+REG_EMS_BMS_CHGI_MAX   = 0xD0F0   # 53488 – Charge Current Max (U16, A×10)
+REG_EMS_BMS_DCHGV_LIM  = 0xD0F1   # 53489 – Discharge Volt Limit (U16, V×10)
+REG_EMS_BMS_DCHGI_MAX  = 0xD0F2   # 53490 – Discharge Current Max (U16, A×10)
+REG_EMS_BMS_BAT_V      = 0xD0F3   # 53491 – Battery Voltage (U16, V×10)
+REG_EMS_BMS_BAT_I      = 0xD0F4   # 53492 – Battery Current (I16, A×10)
+REG_EMS_BMS_BAT_TEMP   = 0xD0F5   # 53493 – Battery Temperature (I16, °C×10)
+
+# ── RW configuration registers ───────────────────────────────────────────────
+# AC Power Scheduling Mode (50202–50206)
+REG_EMS_AC_SCHED_MODE  = 0xC4CA   # 50378 – AC scheduling mode (0=total, 1=per-phase)
+
+# Battery configuration (50100 area)
+REG_BAT_OVERLOAD_METHOD   = 0xC364   # 50020 – Overload method (0=rated, 1=50% over)
+REG_BAT_GRID_INJ_SW       = 0xC366   # 50022 – Grid injection switch
+REG_BAT_GRID_INJ_LIM      = 0xC367   # 50023 – Grid injection limit %
+REG_REACTIVE_POWER_MODE   = 0xC384   # 50052 – Reactive power control mode
+REG_PF_SETTING            = 0xC385   # 50053 – PF Setting
+REG_FAULT_RECOVERY_V_LOW  = 0xC386   # 50054 – Fault recovery voltage lower limit
+REG_FAULT_RECOVERY_V_HIGH = 0xC387   # 50055 – Fault recovery voltage upper limit
+REG_FAULT_RECOVERY_F_LOW  = 0xC388   # 50056 – Fault recovery frequency lower limit
+REG_FAULT_RECOVERY_F_HIGH = 0xC389   # 50057 – Fault recovery frequency upper limit
 
 # ─────────────────────────────────────────────
 # Write-Only Registers
