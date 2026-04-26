@@ -1,0 +1,264 @@
+ems_set_ac_control:
+  name: "EMS: Set AC Control Mode"
+  description: >
+    Switches inverter to EMS_ACCtrlMode and sets total or per-phase AC power
+    scheduling. Positive = inject to grid, negative = purchase from grid (kW).
+  fields:
+    total_power:
+      name: Total Power
+      description: Total 3-phase AC power setpoint in kW (signed).
+      required: false
+      example: -5.0
+      selector:
+        number:
+          min: -30
+          max: 30
+          step: 0.1
+          unit_of_measurement: kW
+    phase_a:
+      name: Phase A Power
+      description: Phase A power setpoint in kW (signed).
+      required: false
+      example: -1.5
+      selector:
+        number:
+          min: -15
+          max: 15
+          step: 0.1
+          unit_of_measurement: kW
+    phase_b:
+      name: Phase B Power
+      description: Phase B power setpoint in kW (signed).
+      required: false
+      example: -1.5
+      selector:
+        number:
+          min: -15
+          max: 15
+          step: 0.1
+          unit_of_measurement: kW
+    phase_c:
+      name: Phase C Power
+      description: Phase C power setpoint in kW (signed).
+      required: false
+      example: -2.0
+      selector:
+        number:
+          min: -15
+          max: 15
+          step: 0.1
+          unit_of_measurement: kW
+
+ems_set_general:
+  name: "EMS: Set General Mode Power Target"
+  description: >
+    Switches to EMS_GeneralMode. Sets the target power at the inverter AC output.
+    Positive = export, negative = import. Formula: Pinv = Pbat + Ppv.
+  fields:
+    power:
+      name: Power Target
+      description: Target AC power in kW (signed).
+      required: true
+      example: 3.0
+      selector:
+        number:
+          min: -30
+          max: 30
+          step: 0.1
+          unit_of_measurement: kW
+
+ems_set_battery_charge:
+  name: "EMS: Battery Charge"
+  description: >
+    Switches to EMS_BattCtrlMode and commands the inverter to charge the battery
+    at the specified power (kW). Grid purchasing limits can also be set.
+    Pbat > 0 means charging.
+  fields:
+    pbat:
+      name: Battery Charge Power (Pbat)
+      description: Charging power in kW (positive).
+      required: true
+      example: 5.0
+      selector:
+        number:
+          min: 0
+          max: 30
+          step: 0.1
+          unit_of_measurement: kW
+    up_limit:
+      name: Grid Import Upper Limit
+      description: Maximum allowed grid purchasing power in kW.
+      required: false
+      example: 10.0
+      selector:
+        number:
+          min: 0
+          max: 30
+          step: 0.1
+          unit_of_measurement: kW
+    low_limit:
+      name: Grid Import Lower Limit
+      description: Minimum grid purchasing power in kW (usually negative = allow export).
+      required: false
+      example: -10.0
+      selector:
+        number:
+          min: -30
+          max: 0
+          step: 0.1
+          unit_of_measurement: kW
+
+ems_set_battery_discharge:
+  name: "EMS: Battery Discharge"
+  description: >
+    Switches to EMS_BattCtrlMode and commands the inverter to discharge the battery
+    at the specified power. Pbat > 0 means discharging.
+  fields:
+    pbat:
+      name: Battery Discharge Power (Pbat)
+      description: Discharging power in kW (positive).
+      required: true
+      example: 3.0
+      selector:
+        number:
+          min: 0
+          max: 30
+          step: 0.1
+          unit_of_measurement: kW
+    up_limit:
+      name: Grid Inject Upper Limit
+      description: Maximum allowed grid injection power in kW.
+      required: false
+      example: 10.0
+      selector:
+        number:
+          min: 0
+          max: 30
+          step: 0.1
+          unit_of_measurement: kW
+    low_limit:
+      name: Grid Inject Lower Limit
+      description: Minimum grid injection power in kW.
+      required: false
+      example: -10.0
+      selector:
+        number:
+          min: -30
+          max: 0
+          step: 0.1
+          unit_of_measurement: kW
+
+ems_force_charge:
+  name: "EMS: Force Battery Charge"
+  description: >
+    Forces battery charging at the specified power, purchasing from grid if needed,
+    regardless of solar production. Useful for off-peak tariff charging.
+  fields:
+    pbat:
+      name: Battery Charge Power (Pbat)
+      description: Forced charging power in kW.
+      required: true
+      example: 8.0
+      selector:
+        number:
+          min: 0
+          max: 30
+          step: 0.1
+          unit_of_measurement: kW
+    up_limit:
+      name: Grid Import Upper Limit
+      description: Max grid purchasing in kW.
+      required: false
+      example: 10.0
+      selector:
+        number:
+          min: 0
+          max: 30
+          step: 0.1
+          unit_of_measurement: kW
+    low_limit:
+      name: Grid Import Lower Limit
+      description: Min grid purchasing in kW.
+      required: false
+      example: -10.0
+      selector:
+        number:
+          min: -30
+          max: 0
+          step: 0.1
+          unit_of_measurement: kW
+
+ems_force_discharge:
+  name: "EMS: Force Battery Discharge"
+  description: >
+    Forces battery discharging at the specified power, injecting to grid if needed.
+    Useful during peak tariff periods.
+  fields:
+    pbat:
+      name: Battery Discharge Power (Pbat)
+      description: Forced discharging power in kW.
+      required: true
+      example: 5.0
+      selector:
+        number:
+          min: 0
+          max: 30
+          step: 0.1
+          unit_of_measurement: kW
+    up_limit:
+      name: Grid Inject Upper Limit
+      description: Max grid injection in kW.
+      required: false
+      example: 10.0
+      selector:
+        number:
+          min: 0
+          max: 30
+          step: 0.1
+          unit_of_measurement: kW
+    low_limit:
+      name: Grid Inject Lower Limit
+      description: Min grid injection in kW.
+      required: false
+      example: -10.0
+      selector:
+        number:
+          min: -30
+          max: 0
+          step: 0.1
+          unit_of_measurement: kW
+
+ems_set_off_grid:
+  name: "EMS: Set Off-Grid PV Setpoint"
+  description: >
+    Switches to EMS_OffGridMode and sets the PV power scheduling setpoint.
+    Pbackup = Pbat + Ppv.
+  fields:
+    ppv:
+      name: PV Power Setpoint
+      description: PV power target in kW.
+      required: true
+      example: 4.0
+      selector:
+        number:
+          min: 0
+          max: 30
+          step: 0.1
+          unit_of_measurement: kW
+
+ems_restore_auto:
+  name: "EMS: Restore Automatic Mode"
+  description: >
+    Exits EMS control and restores the inverter to a standard working mode.
+    Default is General Mode (0 = General, 1 = Economic, 2 = UPS).
+  fields:
+    mode:
+      name: Target Mode
+      description: "Working mode code: 0=General, 1=Economic, 2=UPS, 3=Off-Grid"
+      required: false
+      example: 0
+      selector:
+        number:
+          min: 0
+          max: 3
+          step: 1
