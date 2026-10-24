@@ -1,6 +1,8 @@
 # Selfa SFH — Home Assistant przez bramkę RS485
 
-Wersja **2.0.0**. Bezpośrednie połączenie z falownikiem Selfa SFH przez
+<img src="custom_components/selfa_sfh/brand/icon.png" alt="Selfa SFH" width="96">
+
+Wersja **2.0.1**. Bezpośrednie połączenie z falownikiem Selfa SFH przez
 bramkę Ethernet/Wi-Fi ↔ RS485. ESPHome nie jest potrzebne.
 
 ```mermaid
@@ -142,3 +144,9 @@ Testy uruchamiają lokalny serwer symulujący ramki Modbus TCP oraz RTU przez TC
 z CRC. Sprawdzają dekodowanie, skalowanie, Unit ID 247, potwierdzanie zapisów,
 rozłączenie / ponowne połączenie i pomijanie nieobsługiwanych rejestrów.
 Nie łączą się z urządzeniami użytkownika.
+
+## Ikona integracji
+
+Ikona Selfa znajduje się w `custom_components/selfa_sfh/brand/` jako `icon.png` (256×256) i `icon@2x.png` (512×512), z przezroczystym tłem. Home Assistant 2026.3 lub nowszy wyświetla ją automatycznie po aktualizacji integracji i restarcie; w razie potrzeby odśwież interfejs przez Ctrl+F5. Starsze wersje HA nie obsługują lokalnych ikon `brand/`.
+
+Źródło grafiki: [Selfa PV](https://www.selfa-pv.com/materials/icon_oferta_svg_2/icon10.svg). Zachowano oryginalny kształt i kolor.
