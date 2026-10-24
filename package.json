@@ -1,0 +1,6 @@
+{
+  "name": "selfa-sfh-card-tests",
+  "private": true,
+  "scripts": {"test": "node --test tests/card.test.cjs"},
+  "devDependencies": {"jsdom": "^26.1.0"}
+}

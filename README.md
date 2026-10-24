@@ -1,158 +1,144 @@
-# Selfa SFH Hybrid Inverter — Home Assistant Integration
+# Selfa SFH — Home Assistant przez bramkę RS485
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![HA Version](https://img.shields.io/badge/Home%20Assistant-2024.1%2B-blue.svg)](https://www.home-assistant.io/)
+Wersja **2.0.0**. Bezpośrednie połączenie z falownikiem Selfa SFH przez
+bramkę Ethernet/Wi-Fi ↔ RS485. ESPHome nie jest potrzebne.
 
-Full monitoring and control of the **Selfa SFH hybrid inverter** directly from Home Assistant via **Modbus TCP/RTU**.
+```mermaid
+flowchart LR
+  HA[Home Assistant] <-->|TCP lub RTU przez TCP| GW[Bramka RS485]
+  GW <-->|Modbus RTU| SFH[Selfa SFH]
+```
 
-> Based on the *Selfa Hybrid Inverter MODBUS RTU Protocol* document (Version 1.4).
+## Co zawiera
 
----
+- 100 pozycji tabeli odczytowej z dostarczonego `SFH-modbus.pdf`, w tym dane PV,
+  wszystkie fazy sieci i backup, moce, energie, temperatury, baterię i pełne dane BMS.
+- 75 dodatkowych rejestrów ustawień do podglądu oraz stany dwóch przełączników:
+  razem **177 adresów logicznych**. Rejestry 32-bitowe zajmują po dwa słowa.
+- 179 sensorów (177 wartości rejestrów + opis trybu pracy i kierunku baterii),
+  dwa przełączniki, diagnostyka połączenia i przycisk ponowienia brakujących odczytów.
+- Prawdziwe ramki **RTU przez TCP** dla transparentnych serwerów szeregowych,
+  standardowy **Modbus TCP** dla bramek konwertujących protokół oraz kompatybilność UDP.
+- Konfiguracja przez interfejs HA, zmiana IP/portu bez usuwania integracji,
+  osobne częstotliwości odczytu danych i ustawień.
+- Karta `custom:selfa-card`, ładowana automatycznie jak w integracji Wanas:
+  schemat PV / sieć / falownik / bateria / backup, dane dzienne, fazy i przełączniki.
+  Arial, duże wartości, obsługa polskiego i angielskiego.
+- Grupowanie tylko udokumentowanych, sąsiadujących rejestrów, blokada wspólnych
+  operacji RS485, przerwy między zapytaniami i ponowne połączenie po awarii.
+- Nieobsługiwany opcjonalny rejestr nie blokuje pozostałych odczytów. Jest
+  pomijany do ponowienia przyciskiem „Ponów brakujące odczyty” lub przeładowania integracji.
 
-## Features
+## Instalacja przez HACS
 
-- **50+ sensors** — grid voltages/currents, PV string data, battery state, energy counters (daily & total), temperatures, BMS cell data, backup/EPS port
-- **2 switches** — Grid Injection Limit, Off-Grid Function
-- **1 select** — Inverter Working Mode (General / Economic / UPS / Off-Grid / EMS modes)
-- **1 number slider** — Grid Injection Power Limit (%)
-- Efficient grouped Modbus reads (minimises traffic)
-- Auto-reconnect on connection loss
-- HACS-compatible
+1. HACS → menu → **Niestandardowe repozytoria**.
+2. Dodaj `https://github.com/geogarden/hassio-integration-selfa-sfh`, kategoria **Integracja**.
+3. Pobierz **Selfa SFH** i uruchom ponownie Home Assistant.
+4. Ustawienia → Urządzenia i usługi → Dodaj integrację → **Selfa SFH**.
 
----
+Instalacja ręczna: skopiuj cały katalog `custom_components/selfa_sfh` do
+`/config/custom_components/selfa_sfh` i zrestartuj HA. Wymagany HA 2025.1 lub nowszy.
 
-## Installation
+## Podłączenie bramki
 
-### HACS (recommended)
+1. Podłącz A/B bramki do właściwego portu komunikacyjnego RS485 falownika,
+   zgodnie z oznaczeniami i instrukcją obu urządzeń. Nie używaj portu BMS/CAN baterii.
+2. Ustaw port szeregowy bramki tak jak działające ESPHome: **9600 bit/s, 8N1**
+   (8 bitów danych, brak parzystości, 1 bit stopu), jeżeli nie zmieniono tego w falowniku.
+3. Wybierz tryb **TCP Server** bramki i sprawdź jej rzeczywisty port nasłuchu.
+   Port nie musi wynosić 502; niektóre serwery używają np. 8899 lub innej ustawionej wartości.
+4. Podaj w integracji **IP bramki**, a nie dawny adres ESPHome `192.168.88.44`.
+5. Przed uruchomieniem tej integracji zatrzymaj odczyty ESPHome z tej samej
+   magistrali. Dwa niezależne mastery na jednej RS485 mogą zakłócać odpowiedzi.
 
-1. Open HACS → **Integrations** → three-dot menu → **Custom repositories**
-2. Add this repository URL, category: **Integration**
-3. Search for **Selfa SFH** and install
-4. Restart Home Assistant
+| Pole | Ustawienie |
+|---|---|
+| Host | Rzeczywisty IP / nazwa sieciowa bramki RS485 |
+| Port | Port TCP Server skonfigurowany w bramce; domyślnie 502 |
+| Unit ID | **247**, zgodnie z dotychczasowym ESPHome |
+| `rtu_over_tcp` | Transparentny serwer szeregowy: przenosi surowe ramki RTU z CRC |
+| `tcp` | Bramka konwertująca Modbus TCP (nagłówek MBAP) na Modbus RTU |
+| `udp` | Modbus UDP z nagłówkiem MBAP; nie jest to transparentne RTU przez UDP |
 
-### Manual
+Przy dodawaniu integracja sprawdza odczyt rejestrów **10008** i **10105**.
+Samo otwarcie portu TCP nie jest uznawane za prawidłowe połączenie z falownikiem.
+O ile falownik udostępnia numer seryjny, jest on używany do wykrywania duplikatów.
 
-1. Copy the `custom_components/selfa_sfh` folder into `config/custom_components/`
-2. Restart Home Assistant
+Opcje integracji: dane bieżące domyślnie **30 s**, ustawienia **300 s**, przerwa
+między zapytaniami **200 ms**, limit odpowiedzi **3 s**. Dla wolnej bramki można
+zwiększyć odstępy i timeout. Dane po utracie połączenia stają się niedostępne.
 
----
+## Karta na pulpicie
 
-## Configuration
+Edytuj pulpit, dodaj kartę **Selfa SFH** albo wklej:
 
-1. Go to **Settings → Devices & Services → Add Integration**
-2. Search for **Selfa SFH**
-3. Fill in the connection details:
+```yaml
+type: custom:selfa-card
+title: Selfa SFH 8.1
+```
 
-| Field | Default | Description |
-|-------|---------|-------------|
-| Host | — | IP address of the inverter |
-| Port | `502` | Modbus TCP port |
-| Slave ID | `1` | Modbus device ID |
-| Protocol | `tcp` | `tcp`, `rtu_over_tcp`, or `udp` |
-| Scan interval | `30` | Polling interval in seconds |
+Dla kilku falowników opcjonalnie dodaj `device_id` urządzenia z rejestru HA.
+Karta rozpoznaje encje po kluczach integracji, więc zmiana ich nazw w HA nie
+wymaga poprawiania konfiguracji karty. Nie wymaga zewnętrznych kart ani bibliotek.
 
----
+Plik karty jest udostępniany automatycznie pod
+`/selfa_sfh_static/selfa-card.js?v=2.0.0` po załadowaniu integracji.
+Po aktualizacji uruchom ponownie HA i odśwież stronę przez Ctrl+F5.
 
-## Entities
+## Znaczenie odczytów i sterowania
 
-### Sensors
+- Adresy z dokumentacji są używane bez odejmowania 1. Nie stosujemy starej,
+  niezgodnej mapy `0x0000…0x00AD` z wersji 1.0.0 tego repozytorium.
+- U16/I16/U32/I32, kolejność big-endian i dzielniki pochodzą z tabeli PDF.
+  `SOC` i `SOH` mają dzielnik 100; moce w kW zwykle 1000.
+- Kierunek baterii pochodzi z **30256**: 0 = rozładowywanie, 1 = ładowanie.
+  Ten rejestr nie określa osobnego stanu oczekiwania. Nie zgadujemy kierunku
+  na podstawie znaku prądu lub mocy.
+- Wykres pokazuje moce sieci i baterii ze znakiem zwracanym przez falownik.
+  Nie wylicza chwilowego zużycia domu z niepotwierdzonej konwencji znaków.
+- Energia PV w panelu dziennym pochodzi z **31005**. Rejestry **11018/11020**
+  są nazwane energią inwertera, bo PDF opisuje je jako `Energy-today/total`.
+- Limity opisane w PDF jako `N/A` z dzielnikiem 1000 pozostają ułamkami według
+  tabeli, bez dopisywania niepotwierdzonej jednostki %. Ich atrybuty pokazują adres i dzielnik.
+- Czasy zabezpieczeń w jednostce `Prd` pozostają w jednostce producenta,
+  a zapakowane godziny harmonogramów mają atrybut `time` z formatem HH:MM.
+- Temperatury BMS mają typ U16 zgodnie z tabelą; nie stosujemy nieudokumentowanego
+  przesunięcia ani zmiany na typ ze znakiem.
+- Dwa przełączniki zapisują wyłącznie **50006** (asymetria On-Grid) i **50007**
+  (Peak Load Shifting), wartości 0/1. Po zapisie następuje odczyt potwierdzający.
+  Nie ma zapisu przy dodawaniu integracji ani przy zwykłym odświeżaniu danych.
+- Rejestry WO, emulacja BMS i pola zarezerwowane są pominięte. Harmonogramy,
+  zabezpieczenia i pozostałe ustawienia są dostępne wyłącznie do podglądu.
 
-| Entity | Unit | Description |
-|--------|------|-------------|
-| Inverter Working Status | — | Current operating state |
-| Grid Power (3-Phase Meter) | kW | Total power at grid meter |
-| Grid Power Phase A/B/C | kW | Per-phase grid power |
-| Inverter AC Power | kW | Total inverter AC output |
-| Phase A/B/C Voltage | V | Grid phase voltages |
-| AB/BC/CA Line Voltage | V | Line-to-line voltages |
-| Phase A/B/C Current | A | Grid currents |
-| Grid Frequency | Hz | Measured grid frequency |
-| Energy Today | kWh | Daily inverter generation |
-| Daily PV Generation | kWh | Daily solar harvest |
-| Daily Energy Injected to Grid | kWh | Daily export |
-| Daily Energy Purchased from Grid | kWh | Daily import |
-| Daily Battery Charging/Discharging | kWh | Daily battery flows |
-| Daily Load Consumption | kWh | Daily household consumption |
-| Total Energy Generated | kWh | Lifetime generation |
-| Total PV Generation | kWh | Lifetime PV harvest |
-| Total Injected/Purchased | kWh | Lifetime grid exchange |
-| Total Battery Charging/Discharging | kWh | Lifetime battery flows |
-| Total Load Consumption | kWh | Lifetime load |
-| Total Generation Hours | h | Runtime hours |
-| PV1/PV2 Voltage | V | String voltages |
-| PV1/PV2 Current | A | String currents |
-| PV1/PV2 Input Power | kW | String power |
-| Battery Voltage | V | DC battery voltage |
-| Battery Current | A | Battery current (+ charge) |
-| Battery Power | kW | Battery power flow |
-| Battery Mode | — | Charging / Discharging |
-| Battery State of Charge | % | SOC |
-| Battery State of Health | % | SOH |
-| BMS Pack Temperature | °C | Battery pack temp |
-| Max/Min Cell Temperature | °C | Extreme cell temps |
-| Max/Min Cell Voltage | V | Extreme cell voltages |
-| Inverter Temperature 1–4 | °C | Internal temperatures |
-| Backup Phase A/B/C Power | kW | EPS port power |
-| Backup Total Power | kW | Total EPS power |
-| Smart Meter Status | — | Meter comms status |
+## Aktualizacja z wersji 1.0.0
 
-### Switches
+Zachowano domenę `selfa_sfh`, wpis połączenia i klucze istniejących pomiarów,
+aby ich identyfikatory encji mogły pozostać stabilne. Parametry starego połączenia
+(także stary Unit ID 1) nie są zmieniane automatycznie — popraw je przez
+**Zmień konfigurację**, jeżeli dotyczą innego ustawienia niż działające ESPHome.
 
-| Entity | Description |
-|--------|-------------|
-| Grid Injection Power Limit | Enable/disable the export power cap |
-| Off-Grid Function | Enable/disable off-grid (EPS) mode |
+Stare encje `select`, `number`, przełączniki limitu eksportu / trybu off-grid oraz
+usługi EMS nie są już tworzone: poprzednia implementacja używała niewłaściwej
+mapy adresów. Zastępują je poprawne odczyty ustawień i dwa przełączniki z ESPHome.
+Nie usuwamy ręcznie wpisów użytkownika z rejestru encji HA; stare nieużywane encje
+można usunąć w ustawieniach po sprawdzeniu nowej integracji.
 
-### Select
+**Statystyki historyczne starej wersji mogą mieć błędną skalę** (zwłaszcza moc i SOC).
+Nowe odczyty mają skalę z PDF; aktualizacja nie przelicza starych danych w bazie HA.
 
-| Entity | Options |
-|--------|---------|
-| Inverter Working Mode | General, Economic, UPS, Off-Grid, EMS AC Control, EMS General, EMS Battery Control, EMS Off-Grid |
+Pełna tabela protokołu nie gwarantuje, że firmware konkretnego falownika obsłuży
+każdy rejestr. Instalację na fizycznym SFH trzeba zweryfikować po podłączeniu bramki.
 
-### Number
+## Testy deweloperskie
 
-| Entity | Range | Description |
-|--------|-------|-------------|
-| Grid Injection Power Limit | 0–100 % | Maximum allowed export percentage |
+```bash
+pip install 'homeassistant==2025.1.4' 'pymodbus>=3.10.0,<4.0.0' pytest pytest-asyncio ruff
+python -m pytest tests -q
+ruff check custom_components tests
+node --check custom_components/selfa_sfh/www/selfa-card.js
+```
 
----
-
-## Modbus Register Reference
-
-Key registers used (from the official Selfa SFH Modbus RTU Protocol document):
-
-| Register | Address | Description |
-|----------|---------|-------------|
-| Working Status | 0x000B | Inverter state |
-| P-meter 3-phase | 0x0016–0x0017 | Grid power (I32, ×10 kW) |
-| Phase A Voltage | 0x001F | V (×10) |
-| Grid Frequency | 0x0025 | Hz (×100) |
-| Battery Voltage | 0x0057 | V (×10) |
-| SOC | 0x009F | % |
-| Working Mode | 0xC350 | RW – mode select |
-| Grid Inj. Switch | 0x0076 | RW – on/off |
-| Grid Inj. Limit | 0x0077 | RW – % |
-
----
-
-## Troubleshooting
-
-**"Cannot connect"** — Verify the IP is reachable, port 502 is not firewalled, and the Slave ID matches the inverter setting (check the inverter's LCD/app).
-
-**Sensors show "Unknown"** — Some registers may not be present on all firmware versions. This is normal.
-
-**Protocol selection** — Most Selfa SFH units work with plain `tcp`. Try `rtu_over_tcp` if you get consistent read errors.
-
----
-
-## Requirements
-
-- Home Assistant 2024.1+
-- `pymodbus >= 3.5.0` (auto-installed)
-- Network access to the inverter (Modbus TCP on port 502 by default)
-
----
-
-## License
-
-MIT — see [LICENSE](LICENSE)
+Testy uruchamiają lokalny serwer symulujący ramki Modbus TCP oraz RTU przez TCP
+z CRC. Sprawdzają dekodowanie, skalowanie, Unit ID 247, potwierdzanie zapisów,
+rozłączenie / ponowne połączenie i pomijanie nieobsługiwanych rejestrów.
+Nie łączą się z urządzeniami użytkownika.

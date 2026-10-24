@@ -1,11 +1,23 @@
 {
   "domain": "selfa_sfh",
-  "name": "Selfa SFH Hybrid Inverter",
-  "version": "1.0.0",
-  "documentation": "https://github.com/your-repo/hassio-integration-selfa-sfh",
-  "issue_tracker": "https://github.com/your-repo/hassio-integration-selfa-sfh/issues",
-  "requirements": ["pymodbus>=3.5.0"],
+  "name": "Selfa SFH",
+  "version": "2.0.0",
+  "after_dependencies": [
+    "frontend",
+    "http"
+  ],
+  "codeowners": [
+    "@geogarden"
+  ],
   "config_flow": true,
+  "documentation": "https://github.com/geogarden/hassio-integration-selfa-sfh",
+  "integration_type": "device",
   "iot_class": "local_polling",
-  "codeowners": []
+  "issue_tracker": "https://github.com/geogarden/hassio-integration-selfa-sfh/issues",
+  "loggers": [
+    "pymodbus"
+  ],
+  "requirements": [
+    "pymodbus>=3.10.0,<4.0.0"
+  ]
 }

@@ -1,0 +1,622 @@
+{
+  "title": "Selfa SFH",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Selfa SFH – bramka RS485",
+        "description": "Połącz Home Assistant z bramką RS485. Tryb transparentny: rtu_over_tcp. Bramka konwertująca Modbus TCP na RTU: tcp. IP dotyczy bramki, nie ESPHome. Domyślny adres falownika: 247.",
+        "data": {
+          "host": "Adres IP / nazwa bramki RS485",
+          "port": "Port TCP / UDP",
+          "slave_id": "Adres Modbus falownika (Unit ID)",
+          "protocol": "Protokół"
+        }
+      },
+      "reconfigure": {
+        "title": "Selfa SFH – bramka RS485",
+        "description": "Połącz Home Assistant z bramką RS485. Tryb transparentny: rtu_over_tcp. Bramka konwertująca Modbus TCP na RTU: tcp. IP dotyczy bramki, nie ESPHome. Domyślny adres falownika: 247.",
+        "data": {
+          "host": "Adres IP / nazwa bramki RS485",
+          "port": "Port TCP / UDP",
+          "slave_id": "Adres Modbus falownika (Unit ID)",
+          "protocol": "Protokół"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Brak odpowiedzi. Sprawdź IP, port, protokół, Unit ID i ustawienia RS485.",
+      "cannot_read": "Falownik odrzucił rejestry 10008 lub 10105. Sprawdź zgodność mapy SFH.",
+      "wrong_device": "Numer seryjny nie zgadza się z dotychczasowym falownikiem."
+    },
+    "abort": {
+      "already_configured": "Ten falownik jest już skonfigurowany.",
+      "reconfigure_successful": "Zmieniono parametry połączenia."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Odczyty Modbus",
+        "data": {
+          "scan_interval": "Odczyty bieżące (sekundy)",
+          "settings_interval": "Odczyt ustawień (sekundy)",
+          "request_delay": "Przerwa między zapytaniami (ms)",
+          "timeout": "Limit odpowiedzi (sekundy)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "serial_number": {
+        "name": "Numer seryjny"
+      },
+      "inverter_model": {
+        "name": "Model inwertera (kod)"
+      },
+      "firmware_version": {
+        "name": "Wersja firmware (kod)"
+      },
+      "rtc_year_month": {
+        "name": "RTC rok i miesiąc (kod)"
+      },
+      "rtc_day_hour": {
+        "name": "RTC dzień i godzina (kod)"
+      },
+      "rtc_minute_second": {
+        "name": "RTC minuta i sekunda (kod)"
+      },
+      "safety_code": {
+        "name": "Safety code"
+      },
+      "working_status_raw": {
+        "name": "Status pracy (kod)"
+      },
+      "fault_flag1": {
+        "name": "Fault FLAG1"
+      },
+      "fault_flag2": {
+        "name": "Fault FLAG2"
+      },
+      "fault_flag3": {
+        "name": "Fault FLAG3"
+      },
+      "pmeter_a": {
+        "name": "Moc faza A (licznik)"
+      },
+      "pmeter_b": {
+        "name": "Moc faza B (licznik)"
+      },
+      "pmeter_c": {
+        "name": "Moc faza C (licznik)"
+      },
+      "pmeter_3ph": {
+        "name": "Moc 3-fazowa (licznik)"
+      },
+      "total_grid_inj": {
+        "name": "Energia oddana do sieci (licznik, całkowita)"
+      },
+      "total_purchasing": {
+        "name": "Energia pobrana z sieci (licznik, całkowita)"
+      },
+      "ab_line_v": {
+        "name": "Napięcie międzyfazowe AB"
+      },
+      "bc_line_v": {
+        "name": "Napięcie międzyfazowe BC"
+      },
+      "ca_line_v": {
+        "name": "Napięcie międzyfazowe CA"
+      },
+      "phase_a_v": {
+        "name": "Napięcie faza A"
+      },
+      "phase_a_i": {
+        "name": "Prąd faza A"
+      },
+      "phase_b_v": {
+        "name": "Napięcie faza B"
+      },
+      "phase_b_i": {
+        "name": "Prąd faza B"
+      },
+      "phase_c_v": {
+        "name": "Napięcie faza C"
+      },
+      "phase_c_i": {
+        "name": "Prąd faza C"
+      },
+      "grid_freq": {
+        "name": "Częstotliwość sieci"
+      },
+      "p_ac": {
+        "name": "P_AC (moc wyjściowa AC)"
+      },
+      "energy_today": {
+        "name": "Energia inwertera dzisiaj"
+      },
+      "energy_total": {
+        "name": "Energia inwertera całkowita"
+      },
+      "total_gen_h": {
+        "name": "Godziny pracy"
+      },
+      "total_pv_input": {
+        "name": "Moc PV całkowita"
+      },
+      "temp1": {
+        "name": "Temperatura 1"
+      },
+      "temp2": {
+        "name": "Temperatura 2"
+      },
+      "temp3": {
+        "name": "Temperatura 3"
+      },
+      "temp4": {
+        "name": "Temperatura 4"
+      },
+      "pv1_v": {
+        "name": "PV1 napięcie"
+      },
+      "pv1_i": {
+        "name": "PV1 prąd"
+      },
+      "pv2_v": {
+        "name": "PV2 napięcie"
+      },
+      "pv2_i": {
+        "name": "PV2 prąd"
+      },
+      "pv1_p": {
+        "name": "PV1 moc"
+      },
+      "pv2_p": {
+        "name": "PV2 moc"
+      },
+      "arm_fault_flag": {
+        "name": "ARM Fault FLAG1"
+      },
+      "setting_20000": {
+        "name": "RTC rok i miesiąc"
+      },
+      "setting_20001": {
+        "name": "RTC dzień i godzina"
+      },
+      "setting_20002": {
+        "name": "RTC minuta i sekunda"
+      },
+      "setting_25000": {
+        "name": "Kod sieci"
+      },
+      "setting_25015": {
+        "name": "Metoda przeciążenia"
+      },
+      "setting_25100": {
+        "name": "Ograniczenie eksportu włączone"
+      },
+      "setting_25103": {
+        "name": "Limit eksportu (ułamek wg PDF)"
+      },
+      "setting_25118": {
+        "name": "Limit mocy biernej (ułamek wg PDF)"
+      },
+      "setting_25120": {
+        "name": "Współczynnik mocy PF"
+      },
+      "setting_25121": {
+        "name": "Tryb regulacji mocy biernej"
+      },
+      "setting_28000": {
+        "name": "Dolne napięcie powrotu po błędzie"
+      },
+      "setting_28001": {
+        "name": "Górne napięcie powrotu po błędzie"
+      },
+      "setting_28002": {
+        "name": "Dolna częstotliwość powrotu po błędzie"
+      },
+      "setting_28003": {
+        "name": "Górna częstotliwość powrotu po błędzie"
+      },
+      "setting_28004": {
+        "name": "Próg podnapięciowy poziom 1"
+      },
+      "setting_28005": {
+        "name": "Czas ochrony podnapięciowej poziom 1"
+      },
+      "setting_28006": {
+        "name": "Próg nadnapięciowy poziom 1"
+      },
+      "setting_28007": {
+        "name": "Czas ochrony nadnapięciowej poziom 1"
+      },
+      "setting_28012": {
+        "name": "Próg podczęstotliwościowy poziom 1"
+      },
+      "setting_28013": {
+        "name": "Czas ochrony podczęstotliwościowej poziom 1"
+      },
+      "setting_28014": {
+        "name": "Próg nadczęstotliwościowy poziom 1"
+      },
+      "setting_28015": {
+        "name": "Czas ochrony nadczęstotliwościowej poziom 1"
+      },
+      "backup_a_v": {
+        "name": "Backup A – napięcie"
+      },
+      "backup_a_i": {
+        "name": "Backup A – prąd"
+      },
+      "backup_a_f": {
+        "name": "Backup A – częstotliwość"
+      },
+      "backup_a_p": {
+        "name": "Backup A – moc"
+      },
+      "backup_b_v": {
+        "name": "Backup B – napięcie"
+      },
+      "backup_b_i": {
+        "name": "Backup B – prąd"
+      },
+      "backup_b_f": {
+        "name": "Backup B – częstotliwość"
+      },
+      "backup_b_p": {
+        "name": "Backup B – moc"
+      },
+      "backup_c_v": {
+        "name": "Backup C – napięcie"
+      },
+      "backup_c_i": {
+        "name": "Backup C – prąd"
+      },
+      "backup_c_f": {
+        "name": "Backup C – częstotliwość"
+      },
+      "backup_c_p": {
+        "name": "Backup C – moc"
+      },
+      "backup_total_p": {
+        "name": "Backup – moc całkowita"
+      },
+      "invt_a_p": {
+        "name": "Inwerter – moc faza A"
+      },
+      "invt_b_p": {
+        "name": "Inwerter – moc faza B"
+      },
+      "invt_c_p": {
+        "name": "Inwerter – moc faza C"
+      },
+      "battery_v": {
+        "name": "Bateria – napięcie"
+      },
+      "battery_i": {
+        "name": "Bateria – prąd"
+      },
+      "battery_mode_raw": {
+        "name": "Bateria – kierunek (kod)"
+      },
+      "battery_p": {
+        "name": "Bateria – moc"
+      },
+      "daily_inj": {
+        "name": "Dzisiaj – energia do sieci"
+      },
+      "daily_purch": {
+        "name": "Dzisiaj – energia z sieci"
+      },
+      "daily_backup": {
+        "name": "Dzisiaj – energia backup"
+      },
+      "daily_bat_chg": {
+        "name": "Dzisiaj – ładowanie baterii"
+      },
+      "daily_bat_dchg": {
+        "name": "Dzisiaj – rozładowanie baterii"
+      },
+      "daily_pv_gen": {
+        "name": "Dzisiaj – energia PV"
+      },
+      "daily_load": {
+        "name": "Dzisiaj – zużycie domu"
+      },
+      "daily_purch_inv": {
+        "name": "Dzisiaj – pobór sieci po stronie inwertera"
+      },
+      "total_inj": {
+        "name": "Total – energia do sieci"
+      },
+      "total_purch_grid": {
+        "name": "Total – energia z sieci"
+      },
+      "total_backup": {
+        "name": "Total – energia backup"
+      },
+      "total_bat_chg": {
+        "name": "Total – ładowanie baterii"
+      },
+      "total_bat_dchg": {
+        "name": "Total – rozładowanie baterii"
+      },
+      "total_pv_gen": {
+        "name": "Total – energia PV"
+      },
+      "total_load": {
+        "name": "Total – energia zużyta"
+      },
+      "total_purch_inv": {
+        "name": "Total – pobór sieci po stronie inwertera"
+      },
+      "battery_type": {
+        "name": "Bateria – typ (kod)"
+      },
+      "battery_strings": {
+        "name": "Bateria – liczba stringów"
+      },
+      "battery_protocol": {
+        "name": "Bateria – protokół (kod)"
+      },
+      "battery_software": {
+        "name": "Bateria – wersja oprogramowania (kod)"
+      },
+      "battery_hardware": {
+        "name": "Bateria – wersja sprzętu (kod)"
+      },
+      "bms_charge_imax": {
+        "name": "BMS – maksymalny prąd ładowania"
+      },
+      "bms_discharge_imax": {
+        "name": "BMS – maksymalny prąd rozładowania"
+      },
+      "soc": {
+        "name": "Bateria – SOC"
+      },
+      "soh": {
+        "name": "Bateria – SOH"
+      },
+      "bms_status": {
+        "name": "BMS – status (kod)"
+      },
+      "bms_pack_temp": {
+        "name": "BMS – temperatura pakietu"
+      },
+      "max_cell_temp_id": {
+        "name": "BMS – ID najcieplejszego ogniwa"
+      },
+      "max_cell_temp": {
+        "name": "BMS – najwyższa temperatura ogniwa"
+      },
+      "min_cell_temp_id": {
+        "name": "BMS – ID najchłodniejszego ogniwa"
+      },
+      "min_cell_temp": {
+        "name": "BMS – najniższa temperatura ogniwa"
+      },
+      "max_cell_v_id": {
+        "name": "BMS – ID ogniwa o najwyższym napięciu"
+      },
+      "max_cell_v": {
+        "name": "BMS – najwyższe napięcie ogniwa"
+      },
+      "min_cell_v_id": {
+        "name": "BMS – ID ogniwa o najniższym napięciu"
+      },
+      "min_cell_v": {
+        "name": "BMS – najniższe napięcie ogniwa"
+      },
+      "bms_error_code": {
+        "name": "BMS – kod błędu"
+      },
+      "bms_warn_code": {
+        "name": "BMS – kod ostrzeżenia"
+      },
+      "setting_50000": {
+        "name": "Tryb pracy hybrydowej"
+      },
+      "setting_50001": {
+        "name": "UPS włączony"
+      },
+      "setting_50004": {
+        "name": "Napięcie off-grid"
+      },
+      "setting_50005": {
+        "name": "Częstotliwość off-grid"
+      },
+      "unbalanced_output": {
+        "name": "Asymetria On-Grid"
+      },
+      "peak_load_shifting": {
+        "name": "Peak Load Shifting"
+      },
+      "setting_50009": {
+        "name": "Maksymalna moc sieci"
+      },
+      "setting_50010": {
+        "name": "Rola pracy równoległej"
+      },
+      "setting_50202": {
+        "name": "Tryb zadawania mocy AC"
+      },
+      "setting_50203": {
+        "name": "Zadana moc AC całkowita"
+      },
+      "setting_50204": {
+        "name": "Zadana moc AC faza A"
+      },
+      "setting_50205": {
+        "name": "Zadana moc AC faza B"
+      },
+      "setting_50206": {
+        "name": "Zadana moc AC faza C"
+      },
+      "setting_50207": {
+        "name": "Zadana moc baterii"
+      },
+      "setting_50208": {
+        "name": "Górny limit mocy AC"
+      },
+      "setting_50209": {
+        "name": "Dolny limit mocy AC"
+      },
+      "setting_50210": {
+        "name": "Priorytet oddawania mocy"
+      },
+      "setting_50211": {
+        "name": "Zadana moc PV"
+      },
+      "setting_52500": {
+        "name": "Konfiguracja baterii"
+      },
+      "setting_52501": {
+        "name": "Protokół baterii"
+      },
+      "setting_52502": {
+        "name": "Ochrona SOC on-grid"
+      },
+      "setting_52503": {
+        "name": "Końcowy SOC on-grid (ułamek wg PDF)"
+      },
+      "setting_52504": {
+        "name": "Ochrona SOC off-grid"
+      },
+      "setting_52505": {
+        "name": "Końcowy SOC off-grid (ułamek wg PDF)"
+      },
+      "setting_53006": {
+        "name": "Maska aktywnych okresów"
+      },
+      "setting_53007": {
+        "name": "Okres 1 – ładowanie lub rozładowanie"
+      },
+      "setting_53008": {
+        "name": "Okres 1 – źródło ładowania"
+      },
+      "setting_53010": {
+        "name": "Okres 1 – limit mocy (ułamek wg PDF)"
+      },
+      "setting_53012": {
+        "name": "Okres 1 – początek (kod HHMM)"
+      },
+      "setting_53013": {
+        "name": "Okres 1 – koniec (kod HHMM)"
+      },
+      "setting_53014": {
+        "name": "Okres 2 – ładowanie lub rozładowanie"
+      },
+      "setting_53015": {
+        "name": "Okres 2 – źródło ładowania"
+      },
+      "setting_53017": {
+        "name": "Okres 2 – limit mocy (ułamek wg PDF)"
+      },
+      "setting_53019": {
+        "name": "Okres 2 – początek (kod HHMM)"
+      },
+      "setting_53020": {
+        "name": "Okres 2 – koniec (kod HHMM)"
+      },
+      "setting_53021": {
+        "name": "Okres 3 – ładowanie lub rozładowanie"
+      },
+      "setting_53022": {
+        "name": "Okres 3 – źródło ładowania"
+      },
+      "setting_53024": {
+        "name": "Okres 3 – limit mocy (ułamek wg PDF)"
+      },
+      "setting_53026": {
+        "name": "Okres 3 – początek (kod HHMM)"
+      },
+      "setting_53027": {
+        "name": "Okres 3 – koniec (kod HHMM)"
+      },
+      "setting_53028": {
+        "name": "Okres 4 – ładowanie lub rozładowanie"
+      },
+      "setting_53029": {
+        "name": "Okres 4 – źródło ładowania"
+      },
+      "setting_53031": {
+        "name": "Okres 4 – limit mocy (ułamek wg PDF)"
+      },
+      "setting_53033": {
+        "name": "Okres 4 – początek (kod HHMM)"
+      },
+      "setting_53034": {
+        "name": "Okres 4 – koniec (kod HHMM)"
+      },
+      "setting_53035": {
+        "name": "Okres 5 – ładowanie lub rozładowanie"
+      },
+      "setting_53036": {
+        "name": "Okres 5 – źródło ładowania"
+      },
+      "setting_53038": {
+        "name": "Okres 5 – limit mocy (ułamek wg PDF)"
+      },
+      "setting_53040": {
+        "name": "Okres 5 – początek (kod HHMM)"
+      },
+      "setting_53041": {
+        "name": "Okres 5 – koniec (kod HHMM)"
+      },
+      "setting_53042": {
+        "name": "Okres 6 – ładowanie lub rozładowanie"
+      },
+      "setting_53043": {
+        "name": "Okres 6 – źródło ładowania"
+      },
+      "setting_53045": {
+        "name": "Okres 6 – limit mocy (ułamek wg PDF)"
+      },
+      "setting_53047": {
+        "name": "Okres 6 – początek (kod HHMM)"
+      },
+      "setting_53048": {
+        "name": "Okres 6 – koniec (kod HHMM)"
+      },
+      "working_status": {
+        "name": "Tryb pracy",
+        "state": {
+          "waiting_for_grid": "Oczekiwanie na sieć",
+          "self_test": "Autotest",
+          "on_grid": "Praca on-grid",
+          "fault": "Błąd urządzenia",
+          "firmware_update": "Aktualizacja firmware",
+          "off_grid": "Praca off-grid",
+          "other": "Nieznany stan"
+        }
+      },
+      "battery_mode": {
+        "name": "Tryb baterii",
+        "state": {
+          "charging": "Ładowanie",
+          "discharging": "Rozładowywanie",
+          "other": "Nieznany"
+        }
+      }
+    },
+    "switch": {
+      "unbalanced_output": {
+        "name": "Asymetria On-Grid"
+      },
+      "peak_load_shifting": {
+        "name": "Peak Load Shifting"
+      }
+    },
+    "binary_sensor": {
+      "connection": {
+        "name": "Połączenie Modbus"
+      }
+    },
+    "button": {
+      "retry_registers": {
+        "name": "Ponów brakujące odczyty"
+      }
+    }
+  }
+}

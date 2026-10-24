@@ -1,24 +1,622 @@
 {
+  "title": "Selfa SFH",
   "config": {
     "step": {
       "user": {
-        "title": "Selfa SFH Hybrid Inverter",
-        "description": "Connect to the inverter via Modbus TCP",
+        "title": "Selfa SFH – RS485 gateway",
+        "description": "Connect directly to the RS485 gateway. Transparent serial server: rtu_over_tcp. Modbus TCP-to-RTU converter: tcp. Enter the gateway IP, not the ESPHome node IP. Default inverter unit ID: 247.",
         "data": {
-          "host": "Host (IP address)",
-          "port": "Port",
-          "slave_id": "Slave ID",
-          "protocol": "Protocol",
-          "scan_interval": "Scan interval (seconds)"
+          "host": "RS485 gateway host",
+          "port": "Gateway port",
+          "slave_id": "Inverter Modbus unit ID",
+          "protocol": "Protocol"
+        }
+      },
+      "reconfigure": {
+        "title": "Selfa SFH – RS485 gateway",
+        "description": "Connect directly to the RS485 gateway. Transparent serial server: rtu_over_tcp. Modbus TCP-to-RTU converter: tcp. Enter the gateway IP, not the ESPHome node IP. Default inverter unit ID: 247.",
+        "data": {
+          "host": "RS485 gateway host",
+          "port": "Gateway port",
+          "slave_id": "Inverter Modbus unit ID",
+          "protocol": "Protocol"
         }
       }
     },
     "error": {
-      "cannot_connect": "Cannot connect to the inverter. Check host, port and firewall.",
-      "cannot_read": "Connected but failed to read registers. Check Slave ID and protocol."
+      "cannot_connect": "No response. Check host, port, protocol, unit ID and RS485 settings.",
+      "cannot_read": "Inverter rejected registers 10008 or 10105. Verify the SFH register map.",
+      "wrong_device": "The serial number differs from the configured inverter."
     },
     "abort": {
-      "already_configured": "This inverter is already configured."
+      "already_configured": "This inverter is already configured.",
+      "reconfigure_successful": "Connection details updated."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Modbus polling",
+        "data": {
+          "scan_interval": "Live polling interval (seconds)",
+          "settings_interval": "Settings interval (seconds)",
+          "request_delay": "Delay between requests (ms)",
+          "timeout": "Response timeout (seconds)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "serial_number": {
+        "name": "Serial number"
+      },
+      "inverter_model": {
+        "name": "Inverter model"
+      },
+      "firmware_version": {
+        "name": "Firmware version"
+      },
+      "rtc_year_month": {
+        "name": "Rtc year month"
+      },
+      "rtc_day_hour": {
+        "name": "Rtc day hour"
+      },
+      "rtc_minute_second": {
+        "name": "Rtc minute second"
+      },
+      "safety_code": {
+        "name": "Safety code"
+      },
+      "working_status_raw": {
+        "name": "Working status raw"
+      },
+      "fault_flag1": {
+        "name": "Fault flag1"
+      },
+      "fault_flag2": {
+        "name": "Fault flag2"
+      },
+      "fault_flag3": {
+        "name": "Fault flag3"
+      },
+      "pmeter_a": {
+        "name": "Pmeter a"
+      },
+      "pmeter_b": {
+        "name": "Pmeter b"
+      },
+      "pmeter_c": {
+        "name": "Pmeter c"
+      },
+      "pmeter_3ph": {
+        "name": "Pmeter 3ph"
+      },
+      "total_grid_inj": {
+        "name": "Total grid inj"
+      },
+      "total_purchasing": {
+        "name": "Total purchasing"
+      },
+      "ab_line_v": {
+        "name": "Ab line v"
+      },
+      "bc_line_v": {
+        "name": "Bc line v"
+      },
+      "ca_line_v": {
+        "name": "Ca line v"
+      },
+      "phase_a_v": {
+        "name": "Phase a v"
+      },
+      "phase_a_i": {
+        "name": "Phase a i"
+      },
+      "phase_b_v": {
+        "name": "Phase b v"
+      },
+      "phase_b_i": {
+        "name": "Phase b i"
+      },
+      "phase_c_v": {
+        "name": "Phase c v"
+      },
+      "phase_c_i": {
+        "name": "Phase c i"
+      },
+      "grid_freq": {
+        "name": "Grid freq"
+      },
+      "p_ac": {
+        "name": "P ac"
+      },
+      "energy_today": {
+        "name": "Energy today"
+      },
+      "energy_total": {
+        "name": "Energy total"
+      },
+      "total_gen_h": {
+        "name": "Total gen h"
+      },
+      "total_pv_input": {
+        "name": "Total pv input"
+      },
+      "temp1": {
+        "name": "Temp1"
+      },
+      "temp2": {
+        "name": "Temp2"
+      },
+      "temp3": {
+        "name": "Temp3"
+      },
+      "temp4": {
+        "name": "Temp4"
+      },
+      "pv1_v": {
+        "name": "Pv1 v"
+      },
+      "pv1_i": {
+        "name": "Pv1 i"
+      },
+      "pv2_v": {
+        "name": "Pv2 v"
+      },
+      "pv2_i": {
+        "name": "Pv2 i"
+      },
+      "pv1_p": {
+        "name": "Pv1 p"
+      },
+      "pv2_p": {
+        "name": "Pv2 p"
+      },
+      "arm_fault_flag": {
+        "name": "Arm fault flag"
+      },
+      "setting_20000": {
+        "name": "Setting 20000"
+      },
+      "setting_20001": {
+        "name": "Setting 20001"
+      },
+      "setting_20002": {
+        "name": "Setting 20002"
+      },
+      "setting_25000": {
+        "name": "Setting 25000"
+      },
+      "setting_25015": {
+        "name": "Setting 25015"
+      },
+      "setting_25100": {
+        "name": "Setting 25100"
+      },
+      "setting_25103": {
+        "name": "Setting 25103"
+      },
+      "setting_25118": {
+        "name": "Setting 25118"
+      },
+      "setting_25120": {
+        "name": "Setting 25120"
+      },
+      "setting_25121": {
+        "name": "Setting 25121"
+      },
+      "setting_28000": {
+        "name": "Setting 28000"
+      },
+      "setting_28001": {
+        "name": "Setting 28001"
+      },
+      "setting_28002": {
+        "name": "Setting 28002"
+      },
+      "setting_28003": {
+        "name": "Setting 28003"
+      },
+      "setting_28004": {
+        "name": "Setting 28004"
+      },
+      "setting_28005": {
+        "name": "Setting 28005"
+      },
+      "setting_28006": {
+        "name": "Setting 28006"
+      },
+      "setting_28007": {
+        "name": "Setting 28007"
+      },
+      "setting_28012": {
+        "name": "Setting 28012"
+      },
+      "setting_28013": {
+        "name": "Setting 28013"
+      },
+      "setting_28014": {
+        "name": "Setting 28014"
+      },
+      "setting_28015": {
+        "name": "Setting 28015"
+      },
+      "backup_a_v": {
+        "name": "Backup a v"
+      },
+      "backup_a_i": {
+        "name": "Backup a i"
+      },
+      "backup_a_f": {
+        "name": "Backup a f"
+      },
+      "backup_a_p": {
+        "name": "Backup a p"
+      },
+      "backup_b_v": {
+        "name": "Backup b v"
+      },
+      "backup_b_i": {
+        "name": "Backup b i"
+      },
+      "backup_b_f": {
+        "name": "Backup b f"
+      },
+      "backup_b_p": {
+        "name": "Backup b p"
+      },
+      "backup_c_v": {
+        "name": "Backup c v"
+      },
+      "backup_c_i": {
+        "name": "Backup c i"
+      },
+      "backup_c_f": {
+        "name": "Backup c f"
+      },
+      "backup_c_p": {
+        "name": "Backup c p"
+      },
+      "backup_total_p": {
+        "name": "Backup total p"
+      },
+      "invt_a_p": {
+        "name": "Invt a p"
+      },
+      "invt_b_p": {
+        "name": "Invt b p"
+      },
+      "invt_c_p": {
+        "name": "Invt c p"
+      },
+      "battery_v": {
+        "name": "Battery v"
+      },
+      "battery_i": {
+        "name": "Battery i"
+      },
+      "battery_mode_raw": {
+        "name": "Battery mode raw"
+      },
+      "battery_p": {
+        "name": "Battery p"
+      },
+      "daily_inj": {
+        "name": "Daily inj"
+      },
+      "daily_purch": {
+        "name": "Daily purch"
+      },
+      "daily_backup": {
+        "name": "Daily backup"
+      },
+      "daily_bat_chg": {
+        "name": "Daily bat chg"
+      },
+      "daily_bat_dchg": {
+        "name": "Daily bat dchg"
+      },
+      "daily_pv_gen": {
+        "name": "Daily pv gen"
+      },
+      "daily_load": {
+        "name": "Daily load"
+      },
+      "daily_purch_inv": {
+        "name": "Daily purch inv"
+      },
+      "total_inj": {
+        "name": "Total inj"
+      },
+      "total_purch_grid": {
+        "name": "Total purch grid"
+      },
+      "total_backup": {
+        "name": "Total backup"
+      },
+      "total_bat_chg": {
+        "name": "Total bat chg"
+      },
+      "total_bat_dchg": {
+        "name": "Total bat dchg"
+      },
+      "total_pv_gen": {
+        "name": "Total pv gen"
+      },
+      "total_load": {
+        "name": "Total load"
+      },
+      "total_purch_inv": {
+        "name": "Total purch inv"
+      },
+      "battery_type": {
+        "name": "Battery type"
+      },
+      "battery_strings": {
+        "name": "Battery strings"
+      },
+      "battery_protocol": {
+        "name": "Battery protocol"
+      },
+      "battery_software": {
+        "name": "Battery software"
+      },
+      "battery_hardware": {
+        "name": "Battery hardware"
+      },
+      "bms_charge_imax": {
+        "name": "Bms charge imax"
+      },
+      "bms_discharge_imax": {
+        "name": "Bms discharge imax"
+      },
+      "soc": {
+        "name": "Soc"
+      },
+      "soh": {
+        "name": "Soh"
+      },
+      "bms_status": {
+        "name": "Bms status"
+      },
+      "bms_pack_temp": {
+        "name": "Bms pack temp"
+      },
+      "max_cell_temp_id": {
+        "name": "Max cell temp id"
+      },
+      "max_cell_temp": {
+        "name": "Max cell temp"
+      },
+      "min_cell_temp_id": {
+        "name": "Min cell temp id"
+      },
+      "min_cell_temp": {
+        "name": "Min cell temp"
+      },
+      "max_cell_v_id": {
+        "name": "Max cell v id"
+      },
+      "max_cell_v": {
+        "name": "Max cell v"
+      },
+      "min_cell_v_id": {
+        "name": "Min cell v id"
+      },
+      "min_cell_v": {
+        "name": "Min cell v"
+      },
+      "bms_error_code": {
+        "name": "Bms error code"
+      },
+      "bms_warn_code": {
+        "name": "Bms warn code"
+      },
+      "setting_50000": {
+        "name": "Setting 50000"
+      },
+      "setting_50001": {
+        "name": "Setting 50001"
+      },
+      "setting_50004": {
+        "name": "Setting 50004"
+      },
+      "setting_50005": {
+        "name": "Setting 50005"
+      },
+      "unbalanced_output": {
+        "name": "Unbalanced output"
+      },
+      "peak_load_shifting": {
+        "name": "Peak load shifting"
+      },
+      "setting_50009": {
+        "name": "Setting 50009"
+      },
+      "setting_50010": {
+        "name": "Setting 50010"
+      },
+      "setting_50202": {
+        "name": "Setting 50202"
+      },
+      "setting_50203": {
+        "name": "Setting 50203"
+      },
+      "setting_50204": {
+        "name": "Setting 50204"
+      },
+      "setting_50205": {
+        "name": "Setting 50205"
+      },
+      "setting_50206": {
+        "name": "Setting 50206"
+      },
+      "setting_50207": {
+        "name": "Setting 50207"
+      },
+      "setting_50208": {
+        "name": "Setting 50208"
+      },
+      "setting_50209": {
+        "name": "Setting 50209"
+      },
+      "setting_50210": {
+        "name": "Setting 50210"
+      },
+      "setting_50211": {
+        "name": "Setting 50211"
+      },
+      "setting_52500": {
+        "name": "Setting 52500"
+      },
+      "setting_52501": {
+        "name": "Setting 52501"
+      },
+      "setting_52502": {
+        "name": "Setting 52502"
+      },
+      "setting_52503": {
+        "name": "Setting 52503"
+      },
+      "setting_52504": {
+        "name": "Setting 52504"
+      },
+      "setting_52505": {
+        "name": "Setting 52505"
+      },
+      "setting_53006": {
+        "name": "Setting 53006"
+      },
+      "setting_53007": {
+        "name": "Setting 53007"
+      },
+      "setting_53008": {
+        "name": "Setting 53008"
+      },
+      "setting_53010": {
+        "name": "Setting 53010"
+      },
+      "setting_53012": {
+        "name": "Setting 53012"
+      },
+      "setting_53013": {
+        "name": "Setting 53013"
+      },
+      "setting_53014": {
+        "name": "Setting 53014"
+      },
+      "setting_53015": {
+        "name": "Setting 53015"
+      },
+      "setting_53017": {
+        "name": "Setting 53017"
+      },
+      "setting_53019": {
+        "name": "Setting 53019"
+      },
+      "setting_53020": {
+        "name": "Setting 53020"
+      },
+      "setting_53021": {
+        "name": "Setting 53021"
+      },
+      "setting_53022": {
+        "name": "Setting 53022"
+      },
+      "setting_53024": {
+        "name": "Setting 53024"
+      },
+      "setting_53026": {
+        "name": "Setting 53026"
+      },
+      "setting_53027": {
+        "name": "Setting 53027"
+      },
+      "setting_53028": {
+        "name": "Setting 53028"
+      },
+      "setting_53029": {
+        "name": "Setting 53029"
+      },
+      "setting_53031": {
+        "name": "Setting 53031"
+      },
+      "setting_53033": {
+        "name": "Setting 53033"
+      },
+      "setting_53034": {
+        "name": "Setting 53034"
+      },
+      "setting_53035": {
+        "name": "Setting 53035"
+      },
+      "setting_53036": {
+        "name": "Setting 53036"
+      },
+      "setting_53038": {
+        "name": "Setting 53038"
+      },
+      "setting_53040": {
+        "name": "Setting 53040"
+      },
+      "setting_53041": {
+        "name": "Setting 53041"
+      },
+      "setting_53042": {
+        "name": "Setting 53042"
+      },
+      "setting_53043": {
+        "name": "Setting 53043"
+      },
+      "setting_53045": {
+        "name": "Setting 53045"
+      },
+      "setting_53047": {
+        "name": "Setting 53047"
+      },
+      "setting_53048": {
+        "name": "Setting 53048"
+      },
+      "working_status": {
+        "name": "Operating status",
+        "state": {
+          "waiting_for_grid": "Waiting for grid",
+          "self_test": "Self-test",
+          "on_grid": "On-grid",
+          "fault": "Device fault",
+          "firmware_update": "Firmware update",
+          "off_grid": "Off-grid",
+          "other": "Other"
+        }
+      },
+      "battery_mode": {
+        "name": "Battery mode",
+        "state": {
+          "charging": "Charging",
+          "discharging": "Discharging",
+          "other": "Other"
+        }
+      }
+    },
+    "switch": {
+      "unbalanced_output": {
+        "name": "On-grid unbalanced output"
+      },
+      "peak_load_shifting": {
+        "name": "Peak Load Shifting"
+      }
+    },
+    "binary_sensor": {
+      "connection": {
+        "name": "Modbus connection"
+      }
+    },
+    "button": {
+      "retry_registers": {
+        "name": "Retry unsupported readings"
+      }
     }
   }
 }
