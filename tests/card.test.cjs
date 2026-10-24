@@ -83,3 +83,49 @@ test('language changes and all typography uses Arial without remote dependencies
   assert.equal(card.shadowRoot.querySelectorAll('script,link').length,0);
   dom.window.close();
 });
+
+test('home AC balance, export direction and detailed readings update from actual entities',async()=>{
+  const {dom,card,hass,set}=await fixture();
+  for(const [k,v] of Object.entries({p_ac:5,pmeter_3ph:1.2,soh:99,pv1_p:3,pv2_p:2,battery_v:384,battery_i:-2.1,daily_load:12.4,daily_purch:2.8,daily_inj:5.1,daily_bat_chg:6.2,daily_bat_dchg:3.7,phase_a_v:231,phase_a_i:4.2,pmeter_a:0.4})) set(k,v);
+  card.hass=hass;
+  const r=card.shadowRoot;
+  assert.equal(r.getElementById('home').textContent,'3,8 kW');
+  assert.equal(r.getElementById('gridDirection').textContent,'Oddawanie do sieci');
+  assert.equal(r.querySelectorAll('[data-energy]').length,6);
+  assert.equal(r.querySelectorAll('tbody tr').length,3);
+  assert.equal(r.querySelector('[data-energy="daily_bat_chg"]').textContent,'6,2 kWh');
+  assert.equal(r.getElementById('batteryV').textContent,'384 V');
+  assert.equal(r.getElementById('soh').textContent,'SOH 99 %');
+  assert.equal(r.getElementById('flow-grid').classList.contains('reverse'),false);
+  set('pmeter_3ph',-1);card.hass=hass;
+  assert.equal(r.getElementById('home').textContent,'6 kW');
+  assert.equal(r.getElementById('gridDirection').textContent,'Pobieranie z sieci');
+  assert.equal(r.getElementById('flow-grid').classList.contains('reverse'),true);
+  dom.window.close();
+});
+
+test('battery direction uses mode, SOC is bounded and missing values do not produce a home estimate',async()=>{
+  const {dom,card,hass,set}=await fixture();
+  const r=card.shadowRoot;
+  assert.equal(r.getElementById('home').textContent,'—');
+  assert.equal(r.getElementById('flow-battery').classList.contains('reverse'),true);
+  set('battery_p',1);set('battery_mode','charging');set('soc',120);card.hass=hass;
+  assert.equal(r.getElementById('batteryMode').textContent,'Ładowanie');
+  assert.equal(r.getElementById('flow-battery').classList.contains('reverse'),true);
+  assert.equal(r.getElementById('socFill').style.width,'100%');
+  set('battery_mode','discharging');card.hass=hass;
+  assert.equal(r.getElementById('flow-battery').classList.contains('reverse'),false);
+  set('connection','off','binary_sensor');card.hass=hass;
+  assert.equal(r.querySelectorAll('.stream.active').length,0);
+  assert.equal(r.getElementById('status').textContent,'Brak połączenia');
+  dom.window.close();
+});
+
+test('reversed meter convention and disabled animations are configurable',async()=>{
+  const {dom,card,hass,set}=await fixture({grid_export_positive:false,animate:false});
+  set('p_ac',5);set('pmeter_3ph',-1.2);card.hass=hass;
+  assert.equal(card.shadowRoot.getElementById('home').textContent,'3,8 kW');
+  assert.equal(card.shadowRoot.getElementById('gridDirection').textContent,'Oddawanie do sieci');
+  assert.equal(card.shadowRoot.querySelectorAll('.stream.active').length,0);
+  dom.window.close();
+});

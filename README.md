@@ -2,7 +2,7 @@
 
 <img src="custom_components/selfa_sfh/brand/icon.png" alt="Selfa SFH" width="96">
 
-Wersja **2.0.1**. Bezpośrednie połączenie z falownikiem Selfa SFH przez
+Wersja **2.1.0**. Bezpośrednie połączenie z falownikiem Selfa SFH przez
 bramkę Ethernet/Wi-Fi ↔ RS485. ESPHome nie jest potrzebne.
 
 ```mermaid
@@ -24,7 +24,8 @@ flowchart LR
 - Konfiguracja przez interfejs HA, zmiana IP/portu bez usuwania integracji,
   osobne częstotliwości odczytu danych i ustawień.
 - Karta `custom:selfa-card`, ładowana automatycznie jak w integracji Wanas:
-  schemat PV / sieć / falownik / bateria / backup, dane dzienne, fazy i przełączniki.
+  schemat PV u góry / sieć po lewej / bateria po prawej / falownik pośrodku / dom na dole,
+  animowane przepływy, osobny odczyt backup, dane PV1/PV2, baterii, dzienne i fazowe.
   Arial, duże wartości, obsługa polskiego i angielskiego.
 - Grupowanie tylko udokumentowanych, sąsiadujących rejestrów, blokada wspólnych
   operacji RS485, przerwy między zapytaniami i ponowne połączenie po awarii.
@@ -84,8 +85,12 @@ Karta rozpoznaje encje po kluczach integracji, więc zmiana ich nazw w HA nie
 wymaga poprawiania konfiguracji karty. Nie wymaga zewnętrznych kart ani bibliotek.
 
 Plik karty jest udostępniany automatycznie pod
-`/selfa_sfh_static/selfa-card.js?v=2.0.0` po załadowaniu integracji.
+`/selfa_sfh_static/selfa-card.js?v=2.1.0` po załadowaniu integracji.
 Po aktualizacji uruchom ponownie HA i odśwież stronę przez Ctrl+F5.
+Animacje można wyłączyć przez `animate: false`; karta respektuje też preferencję
+ograniczenia ruchu przeglądarki. Przy braku połączenia przepływy są zatrzymane.
+Panele szczegółów PV1/PV2, sześć energii dziennych i tabela faz są stale widoczne;
+sterowanie rozwija się poniżej schematu.
 
 ## Znaczenie odczytów i sterowania
 
@@ -95,9 +100,14 @@ Po aktualizacji uruchom ponownie HA i odśwież stronę przez Ctrl+F5.
   `SOC` i `SOH` mają dzielnik 100; moce w kW zwykle 1000.
 - Kierunek baterii pochodzi z **30256**: 0 = rozładowywanie, 1 = ładowanie.
   Ten rejestr nie określa osobnego stanu oczekiwania. Nie zgadujemy kierunku
-  na podstawie znaku prądu lub mocy.
+  na podstawie znaku prądu lub mocy. Karta wyświetla „Oczekiwanie”, gdy bezwzględna
+  moc baterii jest mniejsza od 0,01 kW; jest to próg wizualny, nie dodatkowy stan BMS.
 - Wykres pokazuje moce sieci i baterii ze znakiem zwracanym przez falownik.
-  Nie wylicza chwilowego zużycia domu z niepotwierdzonej konwencji znaków.
+  Moc domu jest szacunkiem bilansu AC: `P_AC − eksport netto z licznika`.
+  Domyślnie dodatnia moc licznika oznacza eksport; dla odwrotnej konwencji dodaj
+  `grid_export_positive: false` do konfiguracji karty. Szacunek wymaga licznika
+  obejmującego całą instalację; nie zastępuje dedykowanego pomiaru zużycia domu.
+  Backup jest pokazany osobno i nie jest ponownie dodawany do bilansu.
 - Energia PV w panelu dziennym pochodzi z **31005**. Rejestry **11018/11020**
   są nazwane energią inwertera, bo PDF opisuje je jako `Energy-today/total`.
 - Limity opisane w PDF jako `N/A` z dzielnikiem 1000 pozostają ułamkami według
@@ -150,3 +160,4 @@ Nie łączą się z urządzeniami użytkownika.
 Ikona Selfa znajduje się w `custom_components/selfa_sfh/brand/` jako `icon.png` (256×256) i `icon@2x.png` (512×512), z przezroczystym tłem. Home Assistant 2026.3 lub nowszy wyświetla ją automatycznie po aktualizacji integracji i restarcie; w razie potrzeby odśwież interfejs przez Ctrl+F5. Starsze wersje HA nie obsługują lokalnych ikon `brand/`.
 
 Źródło grafiki: [Selfa PV](https://www.selfa-pv.com/materials/icon_oferta_svg_2/icon10.svg). Zachowano oryginalny kształt i kolor.
+
