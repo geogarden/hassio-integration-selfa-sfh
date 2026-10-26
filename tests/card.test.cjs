@@ -49,29 +49,11 @@ test('card uses the configured device even after entity IDs are renamed',async()
   dom.window.close();
 });
 
-test('a rejected switch change is shown as an error without optimistic state',async()=>{
-  const {dom,card,hass}=await fixture();
-  hass.callService=async()=>{throw Error('rejected')};
-  await card.shadowRoot.querySelector('[data-switch="unbalanced_output"]').onclick();
-  const button=card.shadowRoot.querySelector('[data-switch="unbalanced_output"]');
-  assert.equal(button.classList.contains('on'),false);
-  assert.equal(button.disabled,false);
-  assert.match(card.shadowRoot.getElementById('error').textContent,/rejected/);
-  dom.window.close();
-});
-
-test('switch service targets the resolved entity and controls stay disabled while pending',async()=>{
+test('card is read only even with switch entities available and after updates',async()=>{
   const {dom,card,hass,calls}=await fixture();
-  let release;
-  hass.callService=(...args)=>{calls.push(args);return new Promise(r=>release=r)};
-  const button=card.shadowRoot.querySelector('[data-switch="unbalanced_output"]');
-  const pending=button.onclick();card.hass=hass;
-  assert.equal(button.disabled,true);
-  await button.onclick();
-  assert.equal(calls.length,1);
-  assert.deepEqual(calls[0].slice(0,2),['switch','turn_on']);
-  assert.equal(calls[0][2].entity_id,'switch.unit1_unbalanced_output');
-  release();await pending;
+  for(let i=0;i<3;i++) {card.hass=hass;assert.equal(card.shadowRoot.querySelectorAll('button,[data-switch],details').length,0);}
+  assert.equal(calls.length,0);
+  assert(!fs.readFileSync(path.join(__dirname,'../custom_components/selfa_sfh/www/selfa-card.js'),'utf8').includes('callService'));
   dom.window.close();
 });
 
@@ -127,5 +109,25 @@ test('reversed meter convention and disabled animations are configurable',async(
   assert.equal(card.shadowRoot.getElementById('home').textContent,'3,8 kW');
   assert.equal(card.shadowRoot.getElementById('gridDirection').textContent,'Oddawanie do sieci');
   assert.equal(card.shadowRoot.querySelectorAll('.stream.active').length,0);
+  dom.window.close();
+});
+
+
+test('two PV strings show independent readings and flows without dividing the total',async()=>{
+  const {dom,card,hass,set}=await fixture();
+  for(const [key,value] of Object.entries({pv1_p:2.1,pv2_p:0,pv1_v:360.5,pv1_i:5.8,pv2_v:340,pv2_i:0}))set(key,value);
+  card.hass=hass;const r=card.shadowRoot;
+  assert.equal(r.getElementById('pv1').textContent,'2,1 kW');
+  assert.equal(r.getElementById('pv2').textContent,'0 kW');
+  assert.equal(r.getElementById('pv1detail').textContent,'360,5 V · 5,8 A');
+  assert.equal(r.getElementById('pv2detail').textContent,'340 V · 0 A');
+  assert.equal(r.querySelectorAll('.pv-group .node').length,2);
+  assert.equal(r.querySelectorAll('#pv1').length,1);
+  assert.equal(r.getElementById('flow-pv1').classList.contains('active'),true);
+  assert.equal(r.getElementById('flow-pv2').classList.contains('active'),false);
+  set('pv1_p','unavailable');card.hass=hass;
+  assert.equal(r.getElementById('pv1').textContent,'—');
+  assert.equal(r.getElementById('flow-pv1').classList.contains('active'),false);
+  assert.equal(r.getElementById('pv').textContent,'5,13 kW');
   dom.window.close();
 });

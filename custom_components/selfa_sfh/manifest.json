@@ -1,7 +1,7 @@
 {
   "domain": "selfa_sfh",
   "name": "Selfa SFH",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "after_dependencies": [
     "frontend",
     "http"

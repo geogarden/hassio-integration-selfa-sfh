@@ -2,7 +2,7 @@
 
 <img src="custom_components/selfa_sfh/brand/icon.png" alt="Selfa SFH" width="96">
 
-Wersja **2.1.0**. Bezpośrednie połączenie z falownikiem Selfa SFH przez
+Wersja **2.2.0**. Bezpośrednie połączenie z falownikiem Selfa SFH przez
 bramkę Ethernet/Wi-Fi ↔ RS485. ESPHome nie jest potrzebne.
 
 ```mermaid
@@ -85,12 +85,16 @@ Karta rozpoznaje encje po kluczach integracji, więc zmiana ich nazw w HA nie
 wymaga poprawiania konfiguracji karty. Nie wymaga zewnętrznych kart ani bibliotek.
 
 Plik karty jest udostępniany automatycznie pod
-`/selfa_sfh_static/selfa-card.js?v=2.1.0` po załadowaniu integracji.
+`/selfa_sfh_static/selfa-card.js?v=2.2.0` po załadowaniu integracji.
 Po aktualizacji uruchom ponownie HA i odśwież stronę przez Ctrl+F5.
 Animacje można wyłączyć przez `animate: false`; karta respektuje też preferencję
 ograniczenia ruchu przeglądarki. Przy braku połączenia przepływy są zatrzymane.
 Panele szczegółów PV1/PV2, sześć energii dziennych i tabela faz są stale widoczne;
-sterowanie rozwija się poniżej schematu.
+karta jest wyłącznie do odczytu i nie wywołuje usług sterowania.
+PV1 i PV2 pokazują osobno moc, napięcie i prąd z odczytów integracji.
+Sieć, falownik i bateria mają równą wysokość, a ikony mieszczą się wewnątrz kafelków.
+Półprzezroczyste tło dopasowuje kartę do pulpitu; opcjonalnie ustaw własny kolor CSS
+`--selfa-card-background`. Pozostałe dane dzienne, fazowe i backup pozostają poniżej.
 
 ## Znaczenie odczytów i sterowania
 
