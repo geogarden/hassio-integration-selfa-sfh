@@ -1,5 +1,5 @@
 /* Selfa SFH: bundled local dashboard, no ESPHome or external JS dependencies. */
-const SELFA_CARD_VERSION = "2.2.0";
+const SELFA_CARD_VERSION = "2.2.1";
 const SELFA_LABELS = {
   pl: { home:"Dom", estimated:"Bilans AC · moc szacowana", live:"Panele i bateria · odczyty bieżące", flow:"Przepływ energii", importing:"Pobieranie z sieci", exporting:"Oddawanie do sieci", standby:"Oczekiwanie", title:"Selfa SFH", pv:"Panele PV", string:"String", total:"PV razem", readonly:"Tylko odczyt", battery:"Bateria", inverter:"Falownik AC", grid:"Sieć · licznik", backup:"Backup / EPS",
     today:"Dzisiaj", production:"Produkcja PV", load:"Zużycie domu", imported:"Pobrano z sieci", exported:"Oddano do sieci",
@@ -64,50 +64,63 @@ class SelfaCard extends HTMLElement {
     const t = this._t;
     const node = (cls,icon,label,body)=>`<div class="node ${cls}"><ha-icon icon="mdi:${icon}" aria-hidden="true"></ha-icon><div class="node-label">${label}</div>${body}</div>`;
     this.shadowRoot.innerHTML = `<style>
-      :host {display:block;font-family:Arial,Helvetica,sans-serif;color:#eef3fc;}
+      /* Inherited HA variables update immediately, including themes applied to one card.
+         Keep selfa-card-background as an optional explicit user override. */
+      :host {display:block;font-family:Arial,Helvetica,sans-serif;color:var(--primary-text-color,CanvasText);
+        --_selfa-text:var(--primary-text-color,CanvasText);
+        --_selfa-muted:var(--secondary-text-color,GrayText);
+        --_selfa-surface:var(--ha-card-background,var(--card-background-color,Canvas));
+        --_selfa-line:var(--ha-card-border-color,var(--divider-color,color-mix(in srgb,var(--_selfa-text) 18%,transparent)));
+        --_selfa-node:var(--selfa-node-background,color-mix(in srgb,var(--_selfa-text) 5%,var(--_selfa-surface)));
+        --_selfa-inverter:color-mix(in srgb,var(--primary-color,#03a9f4) 10%,var(--_selfa-surface));
+        --_selfa-solar:var(--energy-solar-color,var(--warning-color,#b87800));
+        --_selfa-grid:var(--energy-grid-consumption-color,var(--success-color,#2e7d32));
+        --_selfa-battery:var(--energy-battery-out-color,#9360c5);
+        --_selfa-home:var(--primary-color,#0288d1);
+      }
       * {box-sizing:border-box;}
-      ha-card {padding:22px;background:var(--selfa-card-background,rgba(18,29,41,.46));color:var(--primary-text-color,#eef3fc);border:1px solid rgba(180,203,225,.13);border-radius:22px;font-family:inherit;container-type:inline-size;backdrop-filter:blur(10px);}
+      ha-card {padding:22px;background:var(--selfa-card-background,color-mix(in srgb,var(--_selfa-surface) 82%,transparent));color:var(--_selfa-text);border:1px solid var(--_selfa-line);border-radius:22px;font-family:inherit;container-type:inline-size;backdrop-filter:blur(10px);}
       .head {display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
       h2 {font-size:24px;margin:0;font-weight:600;letter-spacing:1px;}
-      .status {font-size:13px;color:#a4b7cd;}.status.online {color:#74e3b1;}
+      .status {font-size:13px;color:var(--_selfa-muted);}.status.online {color:var(--success-color,#2e7d32);}
       .flow {position:relative;display:grid;grid-template-columns:minmax(0,1fr) 38px minmax(0,1.15fr) 38px minmax(0,1fr);grid-template-rows:180px 34px 176px 34px 142px;margin:22px auto;max-width:850px;}
       .pv-group {grid-area:1/1/2/6;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 14px;width:76%;justify-self:center;min-width:0;}
-      .pv-total {grid-column:1/-1;text-align:center;font-size:12px;color:#a4b7cd;}
+      .pv-total {grid-column:1/-1;text-align:center;font-size:12px;color:var(--_selfa-muted);}
       .pv-total strong {font-weight:500;}
-      .pv-link {grid-area:2/1/3/6;width:76%;justify-self:center;--flow-color:#f5c941;}
-      .grid-link {grid-area:3/2;--flow-color:#5ee39a;}
-      .battery-link {grid-area:3/4;--flow-color:#c592ff;}
-      .home-link {grid-area:4/3;--flow-color:#50b9ff;}
+      .pv-link {grid-area:2/1/3/6;width:76%;justify-self:center;--flow-color:var(--_selfa-solar);}
+      .grid-link {grid-area:3/2;--flow-color:var(--_selfa-grid);}
+      .battery-link {grid-area:3/4;--flow-color:var(--_selfa-battery);}
+      .home-link {grid-area:4/3;--flow-color:var(--_selfa-home);}
       .link {position:relative;min-width:0;}
       .wires {position:absolute;width:100%;height:100%;inset:0;pointer-events:none;overflow:visible;}
       .wire {fill:none;stroke-width:2;stroke:var(--flow-color);opacity:.25;}
       .stream {fill:none;stroke:var(--flow-color);stroke-width:3;stroke-dasharray:1 17;stroke-linecap:round;opacity:0;}
       .stream.active {opacity:1;animation:flow 2s linear infinite;}.stream.reverse {animation-direction:reverse;}
       @keyframes flow {to {stroke-dashoffset:-36;}}
-      .node {position:relative;z-index:1;display:flex;flex-direction:column;justify-content:center;align-items:center;min-width:0;padding:12px;text-align:center;border:1px solid rgba(165,190,214,.17);border-radius:17px;background:rgba(27,45,61,.3);}
+      .node {position:relative;z-index:1;display:flex;flex-direction:column;justify-content:center;align-items:center;min-width:0;padding:12px;text-align:center;border:1px solid var(--_selfa-line);border-radius:17px;background:var(--_selfa-node);}
       .node ha-icon {display:flex;align-items:center;justify-content:center;width:32px;height:32px;flex:0 0 32px;--mdc-icon-size:26px;color:var(--node-color);margin:0 0 6px;}
-      .node-label {font-size:13px;color:#b7c6d9;margin-bottom:8px;overflow-wrap:anywhere;}
+      .node-label {font-size:13px;color:var(--_selfa-muted);margin-bottom:8px;overflow-wrap:anywhere;}
       .power {font-size:28px;font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;}
-      .detail {font-size:12px;line-height:1.5;color:#a4b7cd;margin-top:6px;overflow-wrap:anywhere;}
-      .pv {--node-color:#f5c941;}.grid {grid-area:3/1;--node-color:#5ee39a;}
-      .inverter {grid-area:3/3;--node-color:#50b9ff;background:rgba(45,87,115,.22);}.battery {grid-area:3/5;--node-color:#c592ff;}
-      .home {grid-area:5/3;--node-color:#50b9ff;}.inverter .power {font-size:22px;letter-spacing:1px;}
-      .soc-track {width:80%;height:6px;background:#26203b;border-radius:4px;margin-top:10px;overflow:hidden;}
-      .soc-fill {height:100%;background:#c592ff;width:0;}
-      .section {border-top:1px solid #293344;padding-top:18px;margin-top:20px;}
+      .detail {font-size:12px;line-height:1.5;color:var(--_selfa-muted);margin-top:6px;overflow-wrap:anywhere;}
+      .pv {--node-color:var(--_selfa-solar);}.grid {grid-area:3/1;--node-color:var(--_selfa-grid);}
+      .inverter {grid-area:3/3;--node-color:var(--_selfa-home);background:var(--_selfa-inverter);}.battery {grid-area:3/5;--node-color:var(--_selfa-battery);}
+      .home {grid-area:5/3;--node-color:var(--_selfa-home);}.inverter .power {font-size:22px;letter-spacing:1px;}
+      .soc-track {width:80%;height:6px;background:color-mix(in srgb,var(--_selfa-battery) 18%,var(--_selfa-surface));border-radius:4px;margin-top:10px;overflow:hidden;}
+      .soc-fill {height:100%;background:var(--_selfa-battery);width:0;}
+      .section {border-top:1px solid var(--_selfa-line);padding-top:18px;margin-top:20px;}
       h3 {font-size:16px;font-weight:600;margin:0 0 14px;}
       .tiles {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
-      .tile {background:rgba(27,45,61,.3);border-radius:12px;padding:14px;min-width:0;}
-      .label {font-size:13px;line-height:1.5;color:#a4b7cd;}
+      .tile {background:var(--_selfa-node);border-radius:12px;padding:14px;min-width:0;}
+      .label {font-size:13px;line-height:1.5;color:var(--_selfa-muted);}
       .number {display:block;font-size:21px;line-height:1.6;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;}
       .energy .tile {background:none;padding:8px 0;}
       table {color:inherit;width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums;}
-      th,td {padding:12px 4px;text-align:right;border-bottom:1px solid #293344;}
-      th:first-child,td:first-child {text-align:left;}th {font-size:12px;color:#a4b7cd;font-weight:400;}
-      .caption {margin:12px 0 0;color:#a4b7cd;font-size:12px;line-height:1.5;}
-      .backup-row {display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px;}.backup-row ha-icon {color:#50b9ff;}
-      .battery-readings {display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#a4b7cd;font-size:13px;}
-      .empty {font-size:14px;padding:12px 0;color:#a4b7cd;}
+      th,td {padding:12px 4px;text-align:right;border-bottom:1px solid var(--_selfa-line);}
+      th:first-child,td:first-child {text-align:left;}th {font-size:12px;color:var(--_selfa-muted);font-weight:400;}
+      .caption {margin:12px 0 0;color:var(--_selfa-muted);font-size:12px;line-height:1.5;}
+      .backup-row {display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px;}.backup-row ha-icon {color:var(--_selfa-home);}
+      .battery-readings {display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--_selfa-muted);font-size:13px;}
+      .empty {font-size:14px;padding:12px 0;color:var(--_selfa-muted);}
       [hidden] {display:none!important;}
       @container(max-width:560px) {.flow {grid-template-columns:minmax(0,1fr) 18px minmax(0,1.15fr) 18px minmax(0,1fr);}.power {font-size:22px;}.node {padding:9px 4px;}.node-label,.detail {font-size:12px;}.number {font-size:19px;}}
       @container(max-width:370px) {.flow {grid-template-columns:minmax(0,1fr) 12px minmax(0,1.15fr) 12px minmax(0,1fr);grid-template-rows:170px 28px 176px 28px 142px;}.power {font-size:18px;}.inverter .power {font-size:17px;letter-spacing:.5px;}.node-label,.detail {font-size:11px;}.node-label {margin-bottom:5px;}.detail {margin-top:4px;}.tiles {grid-template-columns:repeat(2,minmax(0,1fr));}.number {font-size:18px;}ha-card {padding:16px 10px;}}

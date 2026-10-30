@@ -165,3 +165,11 @@ Ikona Selfa znajduje się w `custom_components/selfa_sfh/brand/` jako `icon.png`
 
 Źródło grafiki: [Selfa PV](https://www.selfa-pv.com/materials/icon_oferta_svg_2/icon10.svg). Zachowano oryginalny kształt i kolor.
 
+
+## Motyw karty Selfa
+
+Od wersji 2.2.1 `type: custom:selfa-card` automatycznie korzysta z kolorów aktywnego motywu Home Assistant: tła, tekstu, opisów, obramowań, kafelków i kolorów energii. Przełączenie jasnego/ciemnego motywu działa na już otwartej karcie. Karta zachowuje delikatnie przezroczyste tło. YAML karty nie wymaga zmian.
+
+Opcjonalne zmienne motywu `selfa-card-background` i `selfa-node-background` pozwalają nadpisać tła. Wpisanie stałego koloru w tych zmiennych lub przez `card_mod` ma pierwszeństwo przed automatycznym tłem motywu.
+
+Po aktualizacji integracji uruchom ponownie HA, aby zarejestrował zasób karty z nową wersją; potem odśwież panel.
