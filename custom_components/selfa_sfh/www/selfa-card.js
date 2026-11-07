@@ -1,5 +1,5 @@
 /* Selfa SFH: bundled local dashboard, no ESPHome or external JS dependencies. */
-const SELFA_CARD_VERSION = "2.2.2";
+const SELFA_CARD_VERSION = "2.2.3";
 const SELFA_LABELS = {
   pl: { home:"Dom", estimated:"Bilans AC · moc szacowana", live:"Panele i bateria · odczyty bieżące", flow:"Przepływ energii", importing:"Pobieranie z sieci", exporting:"Oddawanie do sieci", standby:"Oczekiwanie", title:"Selfa SFH", pv:"Panele PV", string:"String", total:"PV razem", readonly:"Tylko odczyt", battery:"Bateria", inverter:"Falownik AC", grid:"Sieć · licznik", backup:"Backup / EPS",
     today:"Dzisiaj", production:"Produkcja PV", load:"Zużycie domu", imported:"Pobrano z sieci", exported:"Oddano do sieci",

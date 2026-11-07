@@ -70,10 +70,10 @@ jobs:
           gh release create v2.2.0 selfa-sfh-2.2.0.zip selfa-sfh-2.2.0.zip.sha256 \
             --target "$SOURCE_SHA" --title "Selfa SFH 2.2.0" --notes-file release-notes.md --latest
 
-  release_2_2_2:
+  release_2_2_3:
     needs: test
     if: >-
-      github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.head_commit.message == 'Release 2.2.2: mini flow-only card'
+      github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.head_commit.message == 'Release 2.2.3: mini flow-only card'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -88,12 +88,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 -c 'import json; assert json.load(open("custom_components/selfa_sfh/manifest.json"))["version"] == "2.2.2"'
-          git archive --format=zip HEAD custom_components/selfa_sfh > selfa-sfh-2.2.2.zip
-          unzip -t selfa-sfh-2.2.2.zip
-          sha256sum selfa-sfh-2.2.2.zip > selfa-sfh-2.2.2.zip.sha256
+          python3 -c 'import json; assert json.load(open("custom_components/selfa_sfh/manifest.json"))["version"] == "2.2.3"'
+          git archive --format=zip HEAD custom_components/selfa_sfh > selfa-sfh-2.2.3.zip
+          unzip -t selfa-sfh-2.2.3.zip
+          sha256sum selfa-sfh-2.2.3.zip > selfa-sfh-2.2.3.zip.sha256
           cat > release-notes.md <<'NOTES'
-          ## Selfa SFH 2.2.2
+          ## Selfa SFH 2.2.3
 
           - Nowy wariant `custom:selfa-card` z opcją `mini: true`: sam schemat przepływu z dwoma stringami PV, siecią, falownikiem, baterią i domem.
           - Ukryty nagłówek i dolne sekcje dodatkowych informacji; zachowane odczyty, animacje, aktywny motyw i wariant pełny.
@@ -107,9 +107,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if gh release view v2.2.2 >/dev/null 2>&1; then
+          if gh release view v2.2.3 >/dev/null 2>&1; then
             echo 'Release already exists.'
             exit 0
           fi
-          gh release create v2.2.2 selfa-sfh-2.2.2.zip selfa-sfh-2.2.2.zip.sha256 \
-            --target "$SOURCE_SHA" --title "Selfa SFH 2.2.2" --notes-file release-notes.md --latest
+          gh release create v2.2.3 selfa-sfh-2.2.3.zip selfa-sfh-2.2.3.zip.sha256 \
+            --target "$SOURCE_SHA" --title "Selfa SFH 2.2.3" --notes-file release-notes.md --latest

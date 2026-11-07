@@ -2,7 +2,7 @@
 
 <img src="custom_components/selfa_sfh/brand/icon.png" alt="Selfa SFH" width="96">
 
-Wersja **2.2.2**. Bezpośrednie połączenie z falownikiem Selfa SFH przez
+Wersja **2.2.3**. Bezpośrednie połączenie z falownikiem Selfa SFH przez
 bramkę Ethernet/Wi-Fi ↔ RS485. ESPHome nie jest potrzebne.
 
 ```mermaid
@@ -85,7 +85,7 @@ Karta rozpoznaje encje po kluczach integracji, więc zmiana ich nazw w HA nie
 wymaga poprawiania konfiguracji karty. Nie wymaga zewnętrznych kart ani bibliotek.
 
 Plik karty jest udostępniany automatycznie pod
-`/selfa_sfh_static/selfa-card.js?v=2.2.2` po załadowaniu integracji.
+`/selfa_sfh_static/selfa-card.js?v=2.2.3` po załadowaniu integracji.
 Po aktualizacji uruchom ponownie HA i odśwież stronę przez Ctrl+F5.
 Animacje można wyłączyć przez `animate: false`; karta respektuje też preferencję
 ograniczenia ruchu przeglądarki. Przy braku połączenia przepływy są zatrzymane.
@@ -184,4 +184,4 @@ mini: true
 
 Wariant mini pokazuje dwa stringi PV, łączną moc i dzisiejszą energię PV, sieć, falownik, baterię oraz dom. Ukrywa nagłówek, pasek SOC i wszystkie informacje pod schematem (dodatkowe odczyty baterii, energię dzienną, tabelę faz oraz backup/EPS). Stan połączenia pozostaje w kafelku falownika. Zachowuje aktywny motyw i konfigurację `device_id`, `animate`, `grid_export_positive`. Domyślny wariant pełny pozostaje dostępny bez `mini: true`. Moc domu jest szacowana z bilansu AC również w wersji mini.
 
-Po aktualizacji do 2.2.2 uruchom ponownie Home Assistant i odśwież pulpit (Ctrl+F5).
+Po aktualizacji do 2.2.3 uruchom ponownie Home Assistant i odśwież pulpit (Ctrl+F5).
