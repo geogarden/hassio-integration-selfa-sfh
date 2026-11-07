@@ -131,3 +131,29 @@ test('two PV strings show independent readings and flows without dividing the to
   assert.equal(r.getElementById('pv').textContent,'5,13 kW');
   dom.window.close();
 });
+
+
+test('mini shows only the live flow and switches back to the full card',async()=>{
+  const {dom,card,hass,set,calls}=await fixture({mini:true,animate:false});
+  const r=card.shadowRoot;
+  assert(r.querySelector('ha-card').classList.contains('mini'));
+  assert.equal(r.querySelector('.head').hidden,true);
+  assert.equal(r.querySelector('.extras').hidden,true);
+  for(const el of r.querySelectorAll('.section')) assert(el.closest('.extras').hidden);
+  assert.equal(r.querySelector('.flow').closest('[hidden]'),null);
+  assert.equal(r.querySelectorAll('.flow .node').length,6);
+  assert.equal(card.getCardSize(),12);
+  set('pv1_p',0.14);set('pv2_p',1.23);set('pmeter_3ph',0);set('soc',90);card.hass=hass;
+  assert.equal(r.getElementById('pv1').textContent,'0,14 kW');
+  assert.equal(r.getElementById('pv2').textContent,'1,23 kW');
+  assert.equal(r.getElementById('grid').textContent,'0 kW');
+  assert.equal(r.getElementById('soc').textContent,'90 %');
+  set('connection','off','binary_sensor');card.hass=hass;
+  assert.equal(r.getElementById('inverterStatus').textContent,'Brak połączenia');
+  assert.equal(calls.length,0);
+  card.setConfig({mini:false});
+  assert.equal(r.querySelector('.head').hidden,false);
+  assert.equal(r.querySelector('.extras').hidden,false);
+  assert.equal(card.getCardSize(),15);
+  dom.window.close();
+});

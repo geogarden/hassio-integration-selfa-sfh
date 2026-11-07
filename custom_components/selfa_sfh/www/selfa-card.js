@@ -1,5 +1,5 @@
 /* Selfa SFH: bundled local dashboard, no ESPHome or external JS dependencies. */
-const SELFA_CARD_VERSION = "2.2.1";
+const SELFA_CARD_VERSION = "2.2.2";
 const SELFA_LABELS = {
   pl: { home:"Dom", estimated:"Bilans AC · moc szacowana", live:"Panele i bateria · odczyty bieżące", flow:"Przepływ energii", importing:"Pobieranie z sieci", exporting:"Oddawanie do sieci", standby:"Oczekiwanie", title:"Selfa SFH", pv:"Panele PV", string:"String", total:"PV razem", readonly:"Tylko odczyt", battery:"Bateria", inverter:"Falownik AC", grid:"Sieć · licznik", backup:"Backup / EPS",
     today:"Dzisiaj", production:"Produkcja PV", load:"Zużycie domu", imported:"Pobrano z sieci", exported:"Oddano do sieci",
@@ -23,7 +23,7 @@ class SelfaCard extends HTMLElement {
     this._built = false;
     if (this._hass) this.hass = this._hass;
   }
-  getCardSize() { return 15; }
+  getCardSize() { return this._config?.mini === true ? 12 : 15; }
   getGridOptions() { return {columns:12,rows:"auto",min_columns:6}; }
   set hass(hass) {
     this._hass = hass;
@@ -62,6 +62,7 @@ class SelfaCard extends HTMLElement {
   }
   _build() {
     const t = this._t;
+    const mini = this._config.mini === true;
     const node = (cls,icon,label,body)=>`<div class="node ${cls}"><ha-icon icon="mdi:${icon}" aria-hidden="true"></ha-icon><div class="node-label">${label}</div>${body}</div>`;
     this.shadowRoot.innerHTML = `<style>
       /* Inherited HA variables update immediately, including themes applied to one card.
@@ -121,12 +122,14 @@ class SelfaCard extends HTMLElement {
       .backup-row {display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px;}.backup-row ha-icon {color:var(--_selfa-home);}
       .battery-readings {display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--_selfa-muted);font-size:13px;}
       .empty {font-size:14px;padding:12px 0;color:var(--_selfa-muted);}
+      .mini .flow {margin:0 auto;}
+      .mini .soc-track {display:none;}
       [hidden] {display:none!important;}
       @container(max-width:560px) {.flow {grid-template-columns:minmax(0,1fr) 18px minmax(0,1.15fr) 18px minmax(0,1fr);}.power {font-size:22px;}.node {padding:9px 4px;}.node-label,.detail {font-size:12px;}.number {font-size:19px;}}
       @container(max-width:370px) {.flow {grid-template-columns:minmax(0,1fr) 12px minmax(0,1.15fr) 12px minmax(0,1fr);grid-template-rows:170px 28px 176px 28px 142px;}.power {font-size:18px;}.inverter .power {font-size:17px;letter-spacing:.5px;}.node-label,.detail {font-size:11px;}.node-label {margin-bottom:5px;}.detail {margin-top:4px;}.tiles {grid-template-columns:repeat(2,minmax(0,1fr));}.number {font-size:18px;}ha-card {padding:16px 10px;}}
       @media(prefers-reduced-motion:reduce) {.stream.active {animation:none;}}
-    </style><ha-card>
-      <div class="head"><div><h2 id="title"></h2><div class="caption">${t.flow} · ${t.readonly}</div></div><span class="status" id="status"></span></div>
+    </style><ha-card class="${mini ? "mini" : "full"}">
+      <div class="head" ${mini ? "hidden" : ""}><div><h2 id="title"></h2><div class="caption">${t.flow} · ${t.readonly}</div></div><span class="status" id="status"></span></div>
       <div class="empty" id="empty" hidden></div><div id="content">
         <div class="flow" role="group" aria-label="${t.flow}">
           <div class="pv-group">
@@ -145,6 +148,7 @@ class SelfaCard extends HTMLElement {
           ${node("battery","battery",t.battery,'<div class="power" id="soc">—</div><div class="detail"><span id="batteryMode"></span> · <span id="battery">—</span></div><div class="soc-track"><div class="soc-fill" id="socFill"></div></div>')}
           ${node("home","home-outline",t.home,'<div class="power" id="home">—</div><div class="detail" id="homeToday"></div>')}
         </div>
+        <div class="extras" ${mini ? "hidden" : ""}>
         <div class="caption">${t.home}: ${t.estimated}</div>
         <div class="section battery-readings"><span>${t.battery}</span><span id="batteryV"></span><span id="batteryI"></span><span id="soh"></span></div>
         <div class="section"><h3>${t.today}</h3><div class="tiles energy">
@@ -154,6 +158,7 @@ class SelfaCard extends HTMLElement {
           ${["a","b","c"].map(k=>`<tr><td>${k.toUpperCase()}</td><td data-value="phase_${k}_v"></td><td data-value="phase_${k}_i"></td><td data-value="pmeter_${k}"></td></tr>`).join("")}
         </tbody></table><div class="caption">${t.sign}</div></div>
         <div class="section backup-row"><ha-icon icon="mdi:power-socket-eu" aria-hidden="true"></ha-icon><span>${t.backup}</span><strong id="backup">—</strong></div>
+        </div>
       </div></ha-card>`;
     this._built = true;
   }
