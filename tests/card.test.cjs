@@ -142,7 +142,7 @@ test('mini shows only the live flow and switches back to the full card',async()=
   for(const el of r.querySelectorAll('.section')) assert(el.closest('.extras').hidden);
   assert.equal(r.querySelector('.flow').closest('[hidden]'),null);
   assert.equal(r.querySelectorAll('.flow .node').length,6);
-  assert.equal(card.getCardSize(),12);
+  assert.equal(card.getCardSize(),9);
   set('pv1_p',0.14);set('pv2_p',1.23);set('pmeter_3ph',0);set('soc',90);card.hass=hass;
   assert.equal(r.getElementById('pv1').textContent,'0,14 kW');
   assert.equal(r.getElementById('pv2').textContent,'1,23 kW');

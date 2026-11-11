@@ -1,5 +1,5 @@
 /* Selfa SFH: bundled local dashboard, no ESPHome or external JS dependencies. */
-const SELFA_CARD_VERSION = "2.2.3";
+const SELFA_CARD_VERSION = "2.2.4";
 const SELFA_LABELS = {
   pl: { home:"Dom", estimated:"Bilans AC · moc szacowana", live:"Panele i bateria · odczyty bieżące", flow:"Przepływ energii", importing:"Pobieranie z sieci", exporting:"Oddawanie do sieci", standby:"Oczekiwanie", title:"Selfa SFH", pv:"Panele PV", string:"String", total:"PV razem", readonly:"Tylko odczyt", battery:"Bateria", inverter:"Falownik AC", grid:"Sieć · licznik", backup:"Backup / EPS",
     today:"Dzisiaj", production:"Produkcja PV", load:"Zużycie domu", imported:"Pobrano z sieci", exported:"Oddano do sieci",
@@ -23,7 +23,7 @@ class SelfaCard extends HTMLElement {
     this._built = false;
     if (this._hass) this.hass = this._hass;
   }
-  getCardSize() { return this._config?.mini === true ? 12 : 15; }
+  getCardSize() { return this._config?.mini === true ? 9 : 15; }
   getGridOptions() { return {columns:12,rows:"auto",min_columns:6}; }
   set hass(hass) {
     this._hass = hass;
@@ -127,6 +127,39 @@ class SelfaCard extends HTMLElement {
       [hidden] {display:none!important;}
       @container(max-width:560px) {.flow {grid-template-columns:minmax(0,1fr) 18px minmax(0,1.15fr) 18px minmax(0,1fr);}.power {font-size:22px;}.node {padding:9px 4px;}.node-label,.detail {font-size:12px;}.number {font-size:19px;}}
       @container(max-width:370px) {.flow {grid-template-columns:minmax(0,1fr) 12px minmax(0,1.15fr) 12px minmax(0,1fr);grid-template-rows:170px 28px 176px 28px 142px;}.power {font-size:18px;}.inverter .power {font-size:17px;letter-spacing:.5px;}.node-label,.detail {font-size:11px;}.node-label {margin-bottom:5px;}.detail {margin-top:4px;}.tiles {grid-template-columns:repeat(2,minmax(0,1fr));}.number {font-size:18px;}ha-card {padding:16px 10px;}}
+      /* Mini: compact flow with HA theme colors and translucent surfaces. */
+      ha-card.mini {padding:14px;border-radius:var(--ha-card-border-radius,12px);
+        background:var(--selfa-card-background,color-mix(in srgb,var(--_selfa-surface) 76%,transparent));
+        --_selfa-mini-node:var(--selfa-node-background,color-mix(in srgb,var(--_selfa-surface) 68%,transparent));}
+      .mini .flow {grid-template-columns:minmax(0,1fr) 22px minmax(0,1.15fr) 22px minmax(0,1fr);
+        grid-template-rows:minmax(140px,auto) 26px minmax(160px,auto) 26px minmax(82px,auto);margin:0 auto;gap:0;}
+      .mini .node {padding:10px 6px;border-radius:10px;background:var(--_selfa-mini-node);box-shadow:0 1px 3px #00000008;}
+      .mini .node ha-icon {width:28px;height:28px;flex-basis:28px;--mdc-icon-size:24px;margin-bottom:5px;}
+      .mini .node-label {font-size:12px;line-height:1.25;margin-bottom:5px;}
+      .mini .power {font-size:24px;line-height:1.15;font-weight:600;}
+      .mini .detail {font-size:11px;line-height:1.4;margin-top:5px;}
+      .mini .inverter {border-color:color-mix(in srgb,var(--primary-color,#03a9f4) 52%,var(--_selfa-line));background:color-mix(in srgb,var(--primary-color,#03a9f4) 8%,var(--_selfa-mini-node));}
+      .mini .inverter .power {font-size:21px;letter-spacing:.5px;}
+      .mini .pv-group {width:100%;gap:8px;grid-template-rows:minmax(min-content,1fr) auto;}
+      .mini .pv {display:grid;grid-template-columns:28px minmax(0,1fr);grid-template-rows:auto auto auto;column-gap:8px;align-content:center;text-align:left;justify-items:start;padding:10px;}
+      .mini .pv ha-icon {grid-column:1;grid-row:1/4;align-self:center;margin:0;}
+      .mini .pv .node-label {grid-column:2;grid-row:1;}
+      .mini .pv .power {grid-column:2;grid-row:2;}
+      .mini .pv .detail {grid-column:2;grid-row:3;}
+      .mini .pv-total {padding:6px 8px;border:1px solid var(--_selfa-line);border-radius:6px;font-size:11px;line-height:1.4;background:var(--_selfa-mini-node);}
+      .mini .pv-link {width:100%;}
+      .mini .home {grid-area:5/1/6/6;display:grid;grid-template-columns:34px minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto;column-gap:12px;text-align:left;padding:12px 16px;}
+      .mini .home ha-icon {grid-column:1;grid-row:1/3;align-self:center;margin:0;}
+      .mini .home .node-label {grid-column:2;grid-row:1;align-self:end;margin:0 0 3px;}
+      .mini .home .power {grid-column:2;grid-row:2;align-self:start;}
+      .mini .home .detail {grid-column:3;grid-row:1/3;align-self:center;margin:0;border-left:1px solid var(--_selfa-line);padding-left:12px;}
+      @container(max-width:370px) {
+        .mini .flow {grid-template-columns:minmax(0,1fr) 12px minmax(0,1.15fr) 12px minmax(0,1fr);grid-template-rows:minmax(136px,auto) 22px minmax(170px,auto) 22px minmax(78px,auto);}
+        .mini .power {font-size:20px;}.mini .inverter .power {font-size:18px;}
+        .mini .node-label {font-size:11px;}.mini .detail {font-size:11px;}
+        .mini .pv {column-gap:6px;padding:8px;}.mini .pv .power {font-size:21px;}
+        .mini .home {column-gap:8px;padding:10px 12px;}.mini .home .detail {padding-left:8px;}
+      }
       @media(prefers-reduced-motion:reduce) {.stream.active {animation:none;}}
     </style><ha-card class="${mini ? "mini" : "full"}">
       <div class="head" ${mini ? "hidden" : ""}><div><h2 id="title"></h2><div class="caption">${t.flow} · ${t.readonly}</div></div><span class="status" id="status"></span></div>
