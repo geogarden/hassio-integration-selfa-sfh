@@ -1,5 +1,5 @@
 /* Selfa SFH: bundled local dashboard, no ESPHome or external JS dependencies. */
-const SELFA_CARD_VERSION = "2.2.6";
+const SELFA_CARD_VERSION = "2.2.7";
 const SELFA_LABELS = {
   pl: { home:"Dom", estimated:"Bilans AC · moc szacowana", live:"Panele i bateria · odczyty bieżące", flow:"Przepływ energii", importing:"Pobieranie z sieci", exporting:"Oddawanie do sieci", standby:"Oczekiwanie", title:"Selfa SFH", pv:"Panele PV", string:"String", total:"PV razem", readonly:"Tylko odczyt", battery:"Bateria", inverter:"Falownik AC", grid:"Sieć · licznik", backup:"Backup / EPS",
     today:"Dzisiaj", production:"Produkcja PV", load:"Zużycie domu", imported:"Pobrano z sieci", exported:"Oddano do sieci",
@@ -196,6 +196,13 @@ class SelfaCard extends HTMLElement {
       .mini .mini-corner-wires .stream {stroke-width:5;stroke-dasharray:22 180;}
       .mini .mini-corner-wires .stream.active {animation:mini-flow 3s linear infinite;}
       .mini .mini-corner-wires .stream.reverse {animation-direction:reverse;}
+      .mini {--_selfa-grid:var(--success-color,#4caf50);}
+      .mini .grid {--node-color:var(--success-color,#4caf50);}
+      .mini .battery,.mini .home {display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:52px 18px 30px;height:100px;justify-items:center;align-items:center;text-align:center;}
+      .mini .battery ha-icon,.mini .home ha-icon {grid-area:1/1;align-self:center;margin:0;}
+      .mini .battery ha-icon {transform:rotate(90deg);}
+      .mini .battery #soc {grid-area:2/1;margin:0;line-height:18px;}
+      .mini .battery .detail,.mini .home .power {grid-area:3/1;align-self:center;justify-self:center;width:100%;margin:0;padding:0;text-align:center;line-height:30px;}
       @keyframes mini-flow {to{stroke-dashoffset:-202;}}
       @media(prefers-reduced-motion:reduce){.mini .mini-corner-wires .stream.active {animation:none;}}
 
