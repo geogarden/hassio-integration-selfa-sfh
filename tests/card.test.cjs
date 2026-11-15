@@ -142,7 +142,7 @@ test('mini shows only the live flow and switches back to the full card',async()=
   for(const el of r.querySelectorAll('.section')) assert(el.closest('.extras').hidden);
   assert.equal(r.querySelector('.flow').closest('[hidden]'),null);
   assert.equal(r.querySelectorAll('.flow .node').length,6);
-  assert.equal(card.getCardSize(),9);
+  assert.equal(card.getCardSize(),6);
   set('pv1_p',0.14);set('pv2_p',1.23);set('pmeter_3ph',0);set('soc',90);card.hass=hass;
   assert.equal(r.getElementById('pv1').textContent,'0,14 kW');
   assert.equal(r.getElementById('pv2').textContent,'1,23 kW');
@@ -156,4 +156,20 @@ test('mini shows only the live flow and switches back to the full card',async()=
   assert.equal(r.querySelector('.extras').hidden,false);
   assert.equal(card.getCardSize(),15);
   dom.window.close();
+});
+
+
+test('proposed mini corner flows follow power direction and stop offline',async()=>{
+ const {dom,card,hass,set}=await fixture({mini:true});
+ set('p_ac',0.69);set('total_pv_input',0.69);set('pmeter_3ph',-0.14);set('battery_p',0);card.hass=hass;
+ const r=card.shadowRoot;
+ assert.equal(r.getElementById('home').textContent,'0,83 kW');
+ assert(r.getElementById('mini-flow-pv').classList.contains('active'));
+ assert(r.getElementById('mini-flow-grid').classList.contains('reverse'));
+ assert(!r.getElementById('mini-flow-battery').classList.contains('active'));
+ set('battery_p',0.5);set('battery_mode','charging');card.hass=hass;
+ assert(r.getElementById('mini-flow-battery').classList.contains('reverse'));
+ set('connection','off','binary_sensor');card.hass=hass;
+ assert.equal(r.querySelectorAll('.stream.active').length,0);
+ dom.window.close();
 });

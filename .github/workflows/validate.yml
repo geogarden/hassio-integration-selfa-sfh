@@ -158,3 +158,48 @@ jobs:
           fi
           gh release create v2.2.4 selfa-sfh-2.2.4.zip selfa-sfh-2.2.4.zip.sha256 \
             --target "$SOURCE_SHA" --title "Selfa SFH 2.2.4" --notes-file release-notes.md --latest
+
+  release_2_2_5:
+    needs: test
+    if: >-
+      github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.head_commit.message == 'Release 2.2.5: corner-layout mini flow card'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      SOURCE_SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare source archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -c 'import json; assert json.load(open("custom_components/selfa_sfh/manifest.json"))["version"] == "2.2.5"'
+          git archive --format=zip HEAD custom_components/selfa_sfh > selfa-sfh-2.2.5.zip
+          unzip -t selfa-sfh-2.2.5.zip
+          sha256sum selfa-sfh-2.2.5.zip > selfa-sfh-2.2.5.zip.sha256
+          cat > release-notes.md <<'NOTES'
+          ## Selfa SFH 2.2.5
+
+          - Nowy układ mini: PV i sieć u góry, bateria i dom na dole, falownik pośrodku.
+          - Kolory, tekst i obramowania dziedziczone z motywu Home Assistant; półprzezroczyste tło i kafelki z zachowaniem nadpisań użytkownika.
+          - Animowane przepływy zgodne z kierunkiem energii; status nad falownikiem, bez napisu SELFA wewnątrz grafiki.
+          - Mniejsza wysokość przy standardowej szerokości oraz elastyczne rzędy dla dłuższych opisów na telefonie.
+
+          Aktualizacja: HACS → Selfa SFH → aktualizuj, uruchom ponownie Home Assistant i odśwież pulpit (Ctrl+F5). Dodaj `mini: true` do YAML karty.
+
+          Paczka ZIP zawiera custom_components/selfa_sfh do instalacji ręcznej.
+          NOTES
+      - name: Publish tested release
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view v2.2.5 >/dev/null 2>&1; then
+            echo 'Release already exists.'
+            exit 0
+          fi
+          gh release create v2.2.5 selfa-sfh-2.2.5.zip selfa-sfh-2.2.5.zip.sha256 \
+            --target "$SOURCE_SHA" --title "Selfa SFH 2.2.5" --notes-file release-notes.md --latest

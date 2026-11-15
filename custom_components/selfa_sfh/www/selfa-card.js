@@ -1,5 +1,5 @@
 /* Selfa SFH: bundled local dashboard, no ESPHome or external JS dependencies. */
-const SELFA_CARD_VERSION = "2.2.4";
+const SELFA_CARD_VERSION = "2.2.5";
 const SELFA_LABELS = {
   pl: { home:"Dom", estimated:"Bilans AC · moc szacowana", live:"Panele i bateria · odczyty bieżące", flow:"Przepływ energii", importing:"Pobieranie z sieci", exporting:"Oddawanie do sieci", standby:"Oczekiwanie", title:"Selfa SFH", pv:"Panele PV", string:"String", total:"PV razem", readonly:"Tylko odczyt", battery:"Bateria", inverter:"Falownik AC", grid:"Sieć · licznik", backup:"Backup / EPS",
     today:"Dzisiaj", production:"Produkcja PV", load:"Zużycie domu", imported:"Pobrano z sieci", exported:"Oddano do sieci",
@@ -23,7 +23,7 @@ class SelfaCard extends HTMLElement {
     this._built = false;
     if (this._hass) this.hass = this._hass;
   }
-  getCardSize() { return this._config?.mini === true ? 9 : 15; }
+  getCardSize() { return this._config?.mini === true ? 6 : 15; }
   getGridOptions() { return {columns:12,rows:"auto",min_columns:6}; }
   set hass(hass) {
     this._hass = hass;
@@ -160,15 +160,53 @@ class SelfaCard extends HTMLElement {
         .mini .pv {column-gap:6px;padding:8px;}.mini .pv .power {font-size:21px;}
         .mini .home {column-gap:8px;padding:10px 12px;}.mini .home .detail {padding-left:8px;}
       }
+
+      /* Proposed mini layout: four corners, central inverter, theme-aware glass. */
+      ha-card.mini {padding:16px;background:var(--selfa-card-background,color-mix(in srgb,var(--_selfa-surface) 65%,transparent));backdrop-filter:blur(14px);}
+      .mini .flow {display:block;position:relative;height:clamp(300px,76cqw,400px);margin:0 auto;}
+      .mini .node,.mini .pv-group {position:absolute;width:29%;margin:0;padding:0;border:0;box-shadow:none;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;}
+      .mini .pv-group {left:1%;top:0;}
+      .mini .grid {right:1%;top:0;}
+      .mini .battery {left:1%;bottom:0;}
+      .mini .home {right:1%;bottom:0;text-align:center;}
+      .mini .pv-group>.pv {display:none;}
+      .mini .pv-total {display:flex;flex-direction:column;align-items:center;gap:4px;padding:0;border:0;background:none;color:var(--_selfa-text);font-size:22px;line-height:1.25;}
+      .mini .pv-total strong {font-weight:600;}
+      .mini .pv-total .total-prefix,.mini .pv-total .total-day {display:none;}
+      .mini .node ha-icon,.mini .pv-total ha-icon {display:flex;width:52px;height:52px;--mdc-icon-size:48px;margin:0 0 3px;color:var(--node-color,var(--_selfa-solar));}
+      .mini .power {font-size:22px;line-height:1.3;}
+      .mini .node-label {font-size:11px;line-height:1.2;margin:2px 0 4px;}
+      .mini .detail {font-size:10px;margin:3px 0 0;padding:0;border:0;}
+      .mini .home .detail {display:none;}
+      .mini .inverter {left:50%;top:50%;transform:translate(-50%,-50%);width:23%;min-height:80px;padding:8px 4px;border:2px solid var(--success-color,#4caf50);border-radius:12px;background:color-mix(in srgb,var(--_selfa-surface) 65%,transparent);--node-color:var(--success-color,#4caf50);}
+      .mini .inverter ha-icon {width:34px;height:34px;--mdc-icon-size:32px;}
+      .mini .inverter .power {font-size:12px;letter-spacing:1.2px;}
+      .mini .inverter .node-label,.mini .inverter #ac {display:none;}
+      .mini .inverter .power {display:none;}
+      .mini #inverterStatus {position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);white-space:nowrap;font-size:11px;}
+      .mini .battery #soc {font-size:12px;color:var(--_selfa-battery);margin-top:2px;}
+      .mini .battery .detail {font-size:22px;font-weight:600;color:var(--_selfa-text);}
+      .mini #batteryMode {display:none;}
+      .mini .battery .mode-separator {display:none;}
+      .mini .link {display:none;}
+      .mini-corner-wires {display:none;}
+      .mini .mini-corner-wires {display:block;position:absolute;width:100%;height:100%;inset:0;pointer-events:none;}
+      .mini .mini-corner-wires .wire {stroke:var(--_selfa-text);stroke-width:5;opacity:.1;}
+      .mini .mini-corner-wires .stream {stroke-width:5;stroke-dasharray:22 180;}
+      .mini .mini-corner-wires .stream.active {animation:mini-flow 3s linear infinite;}
+      .mini .mini-corner-wires .stream.reverse {animation-direction:reverse;}
+      @keyframes mini-flow {to{stroke-dashoffset:-202;}}
+      @media(prefers-reduced-motion:reduce){.mini .mini-corner-wires .stream.active {animation:none;}}
+
       @media(prefers-reduced-motion:reduce) {.stream.active {animation:none;}}
     </style><ha-card class="${mini ? "mini" : "full"}">
       <div class="head" ${mini ? "hidden" : ""}><div><h2 id="title"></h2><div class="caption">${t.flow} · ${t.readonly}</div></div><span class="status" id="status"></span></div>
       <div class="empty" id="empty" hidden></div><div id="content">
-        <div class="flow" role="group" aria-label="${t.flow}">
+        <div class="flow" role="group" aria-label="${t.flow}"><svg class="mini-corner-wires" viewBox="0 0 600 400" preserveAspectRatio="none" aria-hidden="true"><g style="--flow-color:var(--_selfa-solar)"><path class="wire" d="M93 112V164Q93 180 109 180H226"/><path class="stream" id="mini-flow-pv" d="M93 112V164Q93 180 109 180H226"/></g><g style="--flow-color:var(--_selfa-grid)"><path class="wire" d="M374 180H491Q507 180 507 164V112"/><path class="stream" id="mini-flow-grid" d="M374 180H491Q507 180 507 164V112"/></g><g style="--flow-color:var(--_selfa-battery)"><path class="wire" d="M93 288V236Q93 220 109 220H226"/><path class="stream" id="mini-flow-battery" d="M93 288V236Q93 220 109 220H226"/></g><g style="--flow-color:var(--_selfa-home)"><path class="wire" d="M374 220H491Q507 220 507 236V288"/><path class="stream" id="mini-flow-home" d="M374 220H491Q507 220 507 236V288"/></g></svg>
           <div class="pv-group">
             ${node("pv","solar-power",`PV · ${t.string} 1`,'<div class="power" id="pv1">—</div><div class="detail" id="pv1detail"></div>')}
             ${node("pv","solar-power",`PV · ${t.string} 2`,'<div class="power" id="pv2">—</div><div class="detail" id="pv2detail"></div>')}
-            <div class="pv-total">${t.total} · <strong id="pv">—</strong> / <span id="pvToday"></span></div>
+            <div class="pv-total">${mini ? '<ha-icon icon="mdi:solar-power-variant-outline" aria-hidden="true"></ha-icon>' : ""}<span class="total-prefix">${t.total} · </span><strong id="pv">—</strong><span class="total-day"> / <span id="pvToday"></span></span></div>
           </div>
           ${[
             ["pv-link",[["pv1","M25 0V45H50V100"],["pv2","M75 0V45H50V100"]]],
@@ -178,7 +216,7 @@ class SelfaCard extends HTMLElement {
           ].map(([cls,paths])=>`<div class="link ${cls}"><svg class="wires" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${paths.map(([key,d])=>`<path class="wire" d="${d}" vector-effect="non-scaling-stroke"/><path id="flow-${key}" class="stream" d="${d}" vector-effect="non-scaling-stroke"/>`).join("")}</svg></div>`).join("")}
           ${node("grid","transmission-tower",t.grid,'<div class="power" id="grid">—</div><div class="detail" id="gridDirection"></div>')}
           ${node("inverter","chip",t.inverter,'<div class="power">SELFA</div><div class="detail" id="ac">—</div><div class="detail" id="inverterStatus"></div>')}
-          ${node("battery","battery",t.battery,'<div class="power" id="soc">—</div><div class="detail"><span id="batteryMode"></span> · <span id="battery">—</span></div><div class="soc-track"><div class="soc-fill" id="socFill"></div></div>')}
+          ${node("battery","battery",t.battery,'<div class="power" id="soc">—</div><div class="detail"><span id="batteryMode"></span><span class="mode-separator"> · </span><span id="battery">—</span></div><div class="soc-track"><div class="soc-fill" id="socFill"></div></div>')}
           ${node("home","home-outline",t.home,'<div class="power" id="home">—</div><div class="detail" id="homeToday"></div>')}
         </div>
         <div class="extras" ${mini ? "hidden" : ""}>
@@ -229,6 +267,16 @@ class SelfaCard extends HTMLElement {
       ["home",home,home<0,true],
     ]) {
       const stream=$("flow-"+key);
+      stream.classList.toggle("active",online&&valid&&power!=null&&Math.abs(power)>=0.01&&this._config.animate!==false);
+      stream.classList.toggle("reverse",reverse);
+    }
+    for(const [key,power,reverse,valid] of [
+      ["pv",this._value("total_pv_input"),false,true],
+      ["grid",exported,exported<0,true],
+      ["battery",batteryPower,batteryMode==="charging",["charging","discharging"].includes(batteryMode)],
+      ["home",home,home<0,true],
+    ]) {
+      const stream=$("mini-flow-"+key);
       stream.classList.toggle("active",online&&valid&&power!=null&&Math.abs(power)>=0.01&&this._config.animate!==false);
       stream.classList.toggle("reverse",reverse);
     }
