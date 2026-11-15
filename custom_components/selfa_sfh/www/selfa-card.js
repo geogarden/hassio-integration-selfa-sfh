@@ -1,5 +1,5 @@
 /* Selfa SFH: bundled local dashboard, no ESPHome or external JS dependencies. */
-const SELFA_CARD_VERSION = "2.2.5";
+const SELFA_CARD_VERSION = "2.2.6";
 const SELFA_LABELS = {
   pl: { home:"Dom", estimated:"Bilans AC · moc szacowana", live:"Panele i bateria · odczyty bieżące", flow:"Przepływ energii", importing:"Pobieranie z sieci", exporting:"Oddawanie do sieci", standby:"Oczekiwanie", title:"Selfa SFH", pv:"Panele PV", string:"String", total:"PV razem", readonly:"Tylko odczyt", battery:"Bateria", inverter:"Falownik AC", grid:"Sieć · licznik", backup:"Backup / EPS",
     today:"Dzisiaj", production:"Produkcja PV", load:"Zużycie domu", imported:"Pobrano z sieci", exported:"Oddano do sieci",
@@ -183,7 +183,8 @@ class SelfaCard extends HTMLElement {
       .mini .inverter .power {font-size:12px;letter-spacing:1.2px;}
       .mini .inverter .node-label,.mini .inverter #ac {display:none;}
       .mini .inverter .power {display:none;}
-      .mini #inverterStatus {position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);white-space:nowrap;font-size:11px;}
+      .mini .node-label,.mini .pv-total .total-prefix {display:none;}
+      .mini #inverterStatus {color:var(--success-color,#4caf50);font-weight:600;position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);white-space:nowrap;font-size:14px;}
       .mini .battery #soc {font-size:12px;color:var(--_selfa-battery);margin-top:2px;}
       .mini .battery .detail {font-size:22px;font-weight:600;color:var(--_selfa-text);}
       .mini #batteryMode {display:none;}
