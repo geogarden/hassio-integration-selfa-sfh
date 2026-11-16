@@ -150,4 +150,9 @@ class SelfaOptionsFlow(config_entries.OptionsFlow):
                 for key, (default, low, high) in fields.items()
             }
         )
+        schema = schema.extend({
+            vol.Required("control_power_limit_kw", default=data.get("control_power_limit_kw", 0)): vol.All(vol.Coerce(float), vol.Range(min=0, max=327.67)),
+            vol.Required("service_controls", default=data.get("service_controls", False)): bool,
+            vol.Required("ems_controls", default=data.get("ems_controls", False)): bool,
+        })
         return self.async_show_form(step_id="init", data_schema=schema)

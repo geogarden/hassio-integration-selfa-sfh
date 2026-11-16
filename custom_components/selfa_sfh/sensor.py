@@ -6,7 +6,9 @@ from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.helpers.entity import EntityCategory
 
 from .const import BATTERY_STATES, WORK_STATES
+from .controls import CONTROLS
 from .entity import SelfaEntity
+from .faults import fault_attributes
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
@@ -60,6 +62,11 @@ class SelfaRegisterSensor(SelfaEntity, SensorEntity):
             and isinstance(value, int)
         ):
             attrs["time"] = f"{value >> 8:02d}:{value & 255:02d}"
+        if reg.key in ("fault_flag1", "fault_flag2", "fault_flag3", "arm_fault_flag", "bms_error_code", "bms_warn_code"):
+            attrs.update(fault_attributes(reg.key, value))
+        for control in CONTROLS:
+            if control.address == reg.address and control.kind == "select" and isinstance(value, int):
+                attrs["decoded_option"] = control.decode(value)
         return attrs
 
 

@@ -122,3 +122,9 @@ class SelfahybridModbusClient:
             if len(response.registers) != 1 or response.registers[0] != value:
                 raise SelfaConnectionError("Inverter did not confirm the requested switch state")
             return response.registers[0]
+
+
+    async def write_command(self, address: int, value: int) -> None:
+        """A WO command has a Modbus acknowledgement, not register readback."""
+        async with self._lock:
+            await self._exchange("write_register", address=address, value=value)

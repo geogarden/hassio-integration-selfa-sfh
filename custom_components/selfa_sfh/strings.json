@@ -41,8 +41,12 @@
           "scan_interval": "Live polling interval (seconds)",
           "settings_interval": "Settings interval (seconds)",
           "request_delay": "Delay between requests (ms)",
-          "timeout": "Response timeout (seconds)"
-        }
+          "timeout": "Response timeout (seconds)",
+          "control_power_limit_kw": "Commissioned power ceiling for writes (kW/kVA; 0 disables power writes)",
+          "service_controls": "Enable service setting writes",
+          "ems_controls": "Allow expert EMS mode selection"
+        },
+        "description": "Power writes require a commissioned installation ceiling. Service writes default to disabled. Selecting EMS does not implement an external EMS or meter/BMS emulation; these require a separate continuous controller. Disable a schedule period before editing its times."
       }
     }
   },
@@ -606,6 +610,36 @@
       },
       "peak_load_shifting": {
         "name": "Peak Load Shifting"
+      },
+      "ups_enabled": {
+        "name": "Ups enabled"
+      },
+      "export_limit_enabled": {
+        "name": "Export limit enabled"
+      },
+      "on_grid_soc_protection": {
+        "name": "On grid soc protection"
+      },
+      "off_grid_soc_protection": {
+        "name": "Off grid soc protection"
+      },
+      "period_1_enabled": {
+        "name": "Period 1 enabled"
+      },
+      "period_2_enabled": {
+        "name": "Period 2 enabled"
+      },
+      "period_3_enabled": {
+        "name": "Period 3 enabled"
+      },
+      "period_4_enabled": {
+        "name": "Period 4 enabled"
+      },
+      "period_5_enabled": {
+        "name": "Period 5 enabled"
+      },
+      "period_6_enabled": {
+        "name": "Period 6 enabled"
       }
     },
     "binary_sensor": {
@@ -616,6 +650,325 @@
     "button": {
       "retry_registers": {
         "name": "Retry unsupported readings"
+      },
+      "sync_clock": {
+        "name": "Synchronize clock with HA"
+      },
+      "off_grid_on": {
+        "name": "Enable off-grid function (command)"
+      },
+      "off_grid_off": {
+        "name": "Disable off-grid function (command)"
+      },
+      "clear_off_grid_overload": {
+        "name": "Clear off-grid overload flag"
+      }
+    },
+    "select": {
+      "operating_mode": {
+        "name": "Operating mode",
+        "state": {
+          "general": "General",
+          "economic": "Economic",
+          "ups": "Ups",
+          "off_grid": "Off Grid",
+          "ems_ac": "Ems Ac",
+          "ems_general": "Ems General",
+          "ems_battery": "Ems Battery",
+          "ems_off_grid": "Ems Off Grid"
+        }
+      },
+      "ac_control_mode": {
+        "name": "Ac control mode",
+        "state": {
+          "off": "Off",
+          "total": "Total",
+          "per_phase": "Per Phase"
+        }
+      },
+      "power_priority": {
+        "name": "Power priority",
+        "state": {
+          "pv": "Pv",
+          "battery": "Battery"
+        }
+      },
+      "parallel_role": {
+        "name": "Parallel role",
+        "state": {
+          "independent": "Independent",
+          "slave": "Slave",
+          "master": "Master"
+        }
+      },
+      "overload_method": {
+        "name": "Overload method",
+        "state": {
+          "rated": "Rated",
+          "overload_110": "Overload 110",
+          "limit": "Limit"
+        }
+      },
+      "reactive_mode": {
+        "name": "Reactive mode",
+        "state": {
+          "off": "Off",
+          "pf": "Pf",
+          "qt": "Qt",
+          "qp": "Qp",
+          "qu": "Qu"
+        }
+      },
+      "battery_brand": {
+        "name": "Battery brand",
+        "state": {
+          "brand_1": "Brand 1",
+          "external_ems": "External Ems",
+          "wattsonic": "Wattsonic",
+          "aoboet": "Aoboet",
+          "dyness": "Dyness",
+          "pylon": "Pylon",
+          "soluna": "Soluna",
+          "sheenplus": "Sheenplus",
+          "weco": "Weco"
+        }
+      },
+      "period_1_action": {
+        "name": "Period 1 action",
+        "state": {
+          "none": "None",
+          "charge": "Charge",
+          "discharge": "Discharge"
+        }
+      },
+      "period_1_source": {
+        "name": "Period 1 source",
+        "state": {
+          "pv": "Pv",
+          "pv_grid": "Pv Grid"
+        }
+      },
+      "period_2_action": {
+        "name": "Period 2 action",
+        "state": {
+          "none": "None",
+          "charge": "Charge",
+          "discharge": "Discharge"
+        }
+      },
+      "period_2_source": {
+        "name": "Period 2 source",
+        "state": {
+          "pv": "Pv",
+          "pv_grid": "Pv Grid"
+        }
+      },
+      "period_3_action": {
+        "name": "Period 3 action",
+        "state": {
+          "none": "None",
+          "charge": "Charge",
+          "discharge": "Discharge"
+        }
+      },
+      "period_3_source": {
+        "name": "Period 3 source",
+        "state": {
+          "pv": "Pv",
+          "pv_grid": "Pv Grid"
+        }
+      },
+      "period_4_action": {
+        "name": "Period 4 action",
+        "state": {
+          "none": "None",
+          "charge": "Charge",
+          "discharge": "Discharge"
+        }
+      },
+      "period_4_source": {
+        "name": "Period 4 source",
+        "state": {
+          "pv": "Pv",
+          "pv_grid": "Pv Grid"
+        }
+      },
+      "period_5_action": {
+        "name": "Period 5 action",
+        "state": {
+          "none": "None",
+          "charge": "Charge",
+          "discharge": "Discharge"
+        }
+      },
+      "period_5_source": {
+        "name": "Period 5 source",
+        "state": {
+          "pv": "Pv",
+          "pv_grid": "Pv Grid"
+        }
+      },
+      "period_6_action": {
+        "name": "Period 6 action",
+        "state": {
+          "none": "None",
+          "charge": "Charge",
+          "discharge": "Discharge"
+        }
+      },
+      "period_6_source": {
+        "name": "Period 6 source",
+        "state": {
+          "pv": "Pv",
+          "pv_grid": "Pv Grid"
+        }
+      },
+      "battery_protocol_control": {
+        "name": "Battery protocol control",
+        "state": {
+          "protocol_0": "Protocol 0",
+          "protocol_1": "Protocol 1",
+          "ebs_5150": "Ebs 5150"
+        }
+      }
+    },
+    "number": {
+      "export_limit_percent": {
+        "name": "Export limit percent"
+      },
+      "on_grid_end_soc": {
+        "name": "On grid end soc"
+      },
+      "off_grid_end_soc": {
+        "name": "Off grid end soc"
+      },
+      "reactive_limit": {
+        "name": "Reactive limit"
+      },
+      "power_factor": {
+        "name": "Power factor"
+      },
+      "ac_target": {
+        "name": "Ac target"
+      },
+      "phase_a_target": {
+        "name": "Phase a target"
+      },
+      "phase_b_target": {
+        "name": "Phase b target"
+      },
+      "phase_c_target": {
+        "name": "Phase c target"
+      },
+      "battery_target": {
+        "name": "Battery target"
+      },
+      "ac_upper_limit": {
+        "name": "Ac upper limit"
+      },
+      "ac_lower_limit": {
+        "name": "Ac lower limit"
+      },
+      "pv_target": {
+        "name": "Pv target"
+      },
+      "max_grid_power": {
+        "name": "Max grid power"
+      },
+      "period_1_power": {
+        "name": "Period 1 power"
+      },
+      "period_2_power": {
+        "name": "Period 2 power"
+      },
+      "period_3_power": {
+        "name": "Period 3 power"
+      },
+      "period_4_power": {
+        "name": "Period 4 power"
+      },
+      "period_5_power": {
+        "name": "Period 5 power"
+      },
+      "period_6_power": {
+        "name": "Period 6 power"
+      },
+      "recovery_voltage_low": {
+        "name": "Recovery voltage low"
+      },
+      "recovery_voltage_high": {
+        "name": "Recovery voltage high"
+      },
+      "recovery_frequency_low": {
+        "name": "Recovery frequency low"
+      },
+      "recovery_frequency_high": {
+        "name": "Recovery frequency high"
+      },
+      "undervoltage_threshold": {
+        "name": "Undervoltage threshold"
+      },
+      "overvoltage_threshold": {
+        "name": "Overvoltage threshold"
+      },
+      "underfrequency_threshold": {
+        "name": "Underfrequency threshold"
+      },
+      "overfrequency_threshold": {
+        "name": "Overfrequency threshold"
+      },
+      "off_grid_frequency": {
+        "name": "Off grid frequency"
+      },
+      "protection_duration_28005": {
+        "name": "Protection duration 28005"
+      },
+      "protection_duration_28007": {
+        "name": "Protection duration 28007"
+      },
+      "protection_duration_28013": {
+        "name": "Protection duration 28013"
+      },
+      "protection_duration_28015": {
+        "name": "Protection duration 28015"
+      }
+    },
+    "time": {
+      "period_1_start": {
+        "name": "Period 1 start"
+      },
+      "period_1_end": {
+        "name": "Period 1 end"
+      },
+      "period_2_start": {
+        "name": "Period 2 start"
+      },
+      "period_2_end": {
+        "name": "Period 2 end"
+      },
+      "period_3_start": {
+        "name": "Period 3 start"
+      },
+      "period_3_end": {
+        "name": "Period 3 end"
+      },
+      "period_4_start": {
+        "name": "Period 4 start"
+      },
+      "period_4_end": {
+        "name": "Period 4 end"
+      },
+      "period_5_start": {
+        "name": "Period 5 start"
+      },
+      "period_5_end": {
+        "name": "Period 5 end"
+      },
+      "period_6_start": {
+        "name": "Period 6 start"
+      },
+      "period_6_end": {
+        "name": "Period 6 end"
       }
     }
   }

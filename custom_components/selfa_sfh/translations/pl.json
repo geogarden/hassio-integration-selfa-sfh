@@ -41,8 +41,12 @@
           "scan_interval": "Odczyty bieżące (sekundy)",
           "settings_interval": "Odczyt ustawień (sekundy)",
           "request_delay": "Przerwa między zapytaniami (ms)",
-          "timeout": "Limit odpowiedzi (sekundy)"
-        }
+          "timeout": "Limit odpowiedzi (sekundy)",
+          "control_power_limit_kw": "Limit mocy instalacji dla zapisów (kW/kVA; 0 = brak zapisu)",
+          "service_controls": "Włącz zapisy ustawień serwisowych",
+          "ems_controls": "Zezwól na wybór trybów EMS (sterowanie eksperckie)"
+        },
+        "description": "Ustawienia mocy wymagają limitu właściwego dla Twojej instalacji. Ustawienia serwisowe są domyślnie wyłączone. Wybór EMS nie uruchamia zewnętrznego EMS ani emulacji licznika/BMS; wymagają one osobnego, ciągłego sterowania. Przed edycją godzin wyłącz dany okres harmonogramu."
       }
     }
   },
@@ -606,6 +610,36 @@
       },
       "peak_load_shifting": {
         "name": "Peak Load Shifting"
+      },
+      "ups_enabled": {
+        "name": "Funkcja UPS"
+      },
+      "export_limit_enabled": {
+        "name": "Ograniczenie oddawania do sieci"
+      },
+      "on_grid_soc_protection": {
+        "name": "Ochrona SOC on-grid"
+      },
+      "off_grid_soc_protection": {
+        "name": "Ochrona SOC off-grid"
+      },
+      "period_1_enabled": {
+        "name": "Okres 1 — aktywny"
+      },
+      "period_2_enabled": {
+        "name": "Okres 2 — aktywny"
+      },
+      "period_3_enabled": {
+        "name": "Okres 3 — aktywny"
+      },
+      "period_4_enabled": {
+        "name": "Okres 4 — aktywny"
+      },
+      "period_5_enabled": {
+        "name": "Okres 5 — aktywny"
+      },
+      "period_6_enabled": {
+        "name": "Okres 6 — aktywny"
       }
     },
     "binary_sensor": {
@@ -616,6 +650,325 @@
     "button": {
       "retry_registers": {
         "name": "Ponów brakujące odczyty"
+      },
+      "sync_clock": {
+        "name": "Synchronizuj zegar z HA"
+      },
+      "off_grid_on": {
+        "name": "Włącz funkcję off-grid (polecenie)"
+      },
+      "off_grid_off": {
+        "name": "Wyłącz funkcję off-grid (polecenie)"
+      },
+      "clear_off_grid_overload": {
+        "name": "Skasuj flagę przeciążenia off-grid"
+      }
+    },
+    "select": {
+      "operating_mode": {
+        "name": "Tryb pracy",
+        "state": {
+          "general": "Ogólny — autokonsumpcja",
+          "economic": "Ekonomiczny",
+          "ups": "UPS",
+          "off_grid": "Off-grid",
+          "ems_ac": "EMS — moc AC",
+          "ems_general": "EMS — ogólny",
+          "ems_battery": "EMS — bateria",
+          "ems_off_grid": "EMS — off-grid"
+        }
+      },
+      "ac_control_mode": {
+        "name": "Sterowanie mocą AC",
+        "state": {
+          "off": "Wyłączone",
+          "total": "Łączna moc",
+          "per_phase": "Osobno dla faz"
+        }
+      },
+      "power_priority": {
+        "name": "Priorytet oddawania mocy",
+        "state": {
+          "pv": "PV",
+          "battery": "Bateria"
+        }
+      },
+      "parallel_role": {
+        "name": "Praca równoległa",
+        "state": {
+          "independent": "Niezależnie",
+          "slave": "Slave",
+          "master": "Master"
+        }
+      },
+      "overload_method": {
+        "name": "Sposób obsługi przeciążenia",
+        "state": {
+          "rated": "Moc znamionowa",
+          "overload_110": "Przeciążenie 110%",
+          "limit": "Ograniczenie"
+        }
+      },
+      "reactive_mode": {
+        "name": "Regulacja mocy biernej",
+        "state": {
+          "off": "Wyłączone",
+          "pf": "Pf",
+          "qt": "Qt",
+          "qp": "Qp",
+          "qu": "Qu"
+        }
+      },
+      "battery_brand": {
+        "name": "Konfiguracja baterii",
+        "state": {
+          "brand_1": "Marka 1 według PDF",
+          "external_ems": "BMS przez zewnętrzny EMS",
+          "wattsonic": "Wattsonic",
+          "aoboet": "Aoboet",
+          "dyness": "Dyness",
+          "pylon": "Pylon",
+          "soluna": "Soluna",
+          "sheenplus": "Sheenplus",
+          "weco": "Weco"
+        }
+      },
+      "period_1_action": {
+        "name": "Okres 1 — działanie",
+        "state": {
+          "none": "Brak działania",
+          "charge": "Ładowanie",
+          "discharge": "Rozładowanie"
+        }
+      },
+      "period_1_source": {
+        "name": "Okres 1 — źródło ładowania",
+        "state": {
+          "pv": "PV",
+          "pv_grid": "PV + sieć"
+        }
+      },
+      "period_2_action": {
+        "name": "Okres 2 — działanie",
+        "state": {
+          "none": "Brak działania",
+          "charge": "Ładowanie",
+          "discharge": "Rozładowanie"
+        }
+      },
+      "period_2_source": {
+        "name": "Okres 2 — źródło ładowania",
+        "state": {
+          "pv": "PV",
+          "pv_grid": "PV + sieć"
+        }
+      },
+      "period_3_action": {
+        "name": "Okres 3 — działanie",
+        "state": {
+          "none": "Brak działania",
+          "charge": "Ładowanie",
+          "discharge": "Rozładowanie"
+        }
+      },
+      "period_3_source": {
+        "name": "Okres 3 — źródło ładowania",
+        "state": {
+          "pv": "PV",
+          "pv_grid": "PV + sieć"
+        }
+      },
+      "period_4_action": {
+        "name": "Okres 4 — działanie",
+        "state": {
+          "none": "Brak działania",
+          "charge": "Ładowanie",
+          "discharge": "Rozładowanie"
+        }
+      },
+      "period_4_source": {
+        "name": "Okres 4 — źródło ładowania",
+        "state": {
+          "pv": "PV",
+          "pv_grid": "PV + sieć"
+        }
+      },
+      "period_5_action": {
+        "name": "Okres 5 — działanie",
+        "state": {
+          "none": "Brak działania",
+          "charge": "Ładowanie",
+          "discharge": "Rozładowanie"
+        }
+      },
+      "period_5_source": {
+        "name": "Okres 5 — źródło ładowania",
+        "state": {
+          "pv": "PV",
+          "pv_grid": "PV + sieć"
+        }
+      },
+      "period_6_action": {
+        "name": "Okres 6 — działanie",
+        "state": {
+          "none": "Brak działania",
+          "charge": "Ładowanie",
+          "discharge": "Rozładowanie"
+        }
+      },
+      "period_6_source": {
+        "name": "Okres 6 — źródło ładowania",
+        "state": {
+          "pv": "PV",
+          "pv_grid": "PV + sieć"
+        }
+      },
+      "battery_protocol_control": {
+        "name": "Protokół baterii (marka 1)",
+        "state": {
+          "protocol_0": "Kod 0",
+          "protocol_1": "Kod 1",
+          "ebs_5150": "EBS-5150"
+        }
+      }
+    },
+    "number": {
+      "export_limit_percent": {
+        "name": "Limit oddawania do sieci"
+      },
+      "on_grid_end_soc": {
+        "name": "Minimalny SOC on-grid"
+      },
+      "off_grid_end_soc": {
+        "name": "Minimalny SOC off-grid"
+      },
+      "reactive_limit": {
+        "name": "Limit mocy biernej"
+      },
+      "power_factor": {
+        "name": "Współczynnik mocy PF"
+      },
+      "ac_target": {
+        "name": "Zadana moc AC"
+      },
+      "phase_a_target": {
+        "name": "Zadana moc fazy A"
+      },
+      "phase_b_target": {
+        "name": "Zadana moc fazy B"
+      },
+      "phase_c_target": {
+        "name": "Zadana moc fazy C"
+      },
+      "battery_target": {
+        "name": "Zadana moc baterii"
+      },
+      "ac_upper_limit": {
+        "name": "Górny limit mocy AC"
+      },
+      "ac_lower_limit": {
+        "name": "Dolny limit mocy AC"
+      },
+      "pv_target": {
+        "name": "Zadana moc PV"
+      },
+      "max_grid_power": {
+        "name": "Maksymalna moc sieci"
+      },
+      "period_1_power": {
+        "name": "Okres 1 — limit mocy"
+      },
+      "period_2_power": {
+        "name": "Okres 2 — limit mocy"
+      },
+      "period_3_power": {
+        "name": "Okres 3 — limit mocy"
+      },
+      "period_4_power": {
+        "name": "Okres 4 — limit mocy"
+      },
+      "period_5_power": {
+        "name": "Okres 5 — limit mocy"
+      },
+      "period_6_power": {
+        "name": "Okres 6 — limit mocy"
+      },
+      "recovery_voltage_low": {
+        "name": "Dolny próg napięcia powrotu"
+      },
+      "recovery_voltage_high": {
+        "name": "Górny próg napięcia powrotu"
+      },
+      "recovery_frequency_low": {
+        "name": "Dolny próg częstotliwości powrotu"
+      },
+      "recovery_frequency_high": {
+        "name": "Górny próg częstotliwości powrotu"
+      },
+      "undervoltage_threshold": {
+        "name": "Próg ochrony podnapięciowej"
+      },
+      "overvoltage_threshold": {
+        "name": "Próg ochrony nadnapięciowej"
+      },
+      "underfrequency_threshold": {
+        "name": "Próg ochrony podczęstotliwościowej"
+      },
+      "overfrequency_threshold": {
+        "name": "Próg ochrony nadczęstotliwościowej"
+      },
+      "off_grid_frequency": {
+        "name": "Częstotliwość off-grid"
+      },
+      "protection_duration_28005": {
+        "name": "Czas zabezpieczenia 28005 (Prd)"
+      },
+      "protection_duration_28007": {
+        "name": "Czas zabezpieczenia 28007 (Prd)"
+      },
+      "protection_duration_28013": {
+        "name": "Czas zabezpieczenia 28013 (Prd)"
+      },
+      "protection_duration_28015": {
+        "name": "Czas zabezpieczenia 28015 (Prd)"
+      }
+    },
+    "time": {
+      "period_1_start": {
+        "name": "Okres 1 — początek"
+      },
+      "period_1_end": {
+        "name": "Okres 1 — koniec"
+      },
+      "period_2_start": {
+        "name": "Okres 2 — początek"
+      },
+      "period_2_end": {
+        "name": "Okres 2 — koniec"
+      },
+      "period_3_start": {
+        "name": "Okres 3 — początek"
+      },
+      "period_3_end": {
+        "name": "Okres 3 — koniec"
+      },
+      "period_4_start": {
+        "name": "Okres 4 — początek"
+      },
+      "period_4_end": {
+        "name": "Okres 4 — koniec"
+      },
+      "period_5_start": {
+        "name": "Okres 5 — początek"
+      },
+      "period_5_end": {
+        "name": "Okres 5 — koniec"
+      },
+      "period_6_start": {
+        "name": "Okres 6 — początek"
+      },
+      "period_6_end": {
+        "name": "Okres 6 — koniec"
       }
     }
   }

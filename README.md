@@ -185,3 +185,13 @@ mini: true
 Wariant mini ma zwarty układ z niskim paskiem domu na dole, mniejszymi odstępami i półprzezroczystymi powierzchniami. Kolory i obramowania dziedziczy z motywu Home Assistant (jasnego i ciemnego); zachowuje nadpisania `selfa-card-background` i `selfa-node-background`. Pokazuje dwa stringi PV, łączną moc i dzisiejszą energię PV, sieć, falownik, baterię oraz dom. Ukrywa nagłówek, pasek SOC i wszystkie informacje pod schematem (dodatkowe odczyty baterii, energię dzienną, tabelę faz oraz backup/EPS). Stan połączenia pozostaje w kafelku falownika. Zachowuje aktywny motyw i konfigurację `device_id`, `animate`, `grid_export_positive`. Domyślny wariant pełny pozostaje dostępny bez `mini: true`. Moc domu jest szacowana z bilansu AC również w wersji mini.
 
 Po aktualizacji do 2.2.4 uruchom ponownie Home Assistant i odśwież pulpit (Ctrl+F5).
+
+
+## Sterowanie i harmonogram — 2.3.0
+
+Dodano encje select, number i time oraz rozszerzone przełączniki i przyciski.
+Tryb pracy, UPS, progi SOC i 6 okresów baterii można ustawiać w HA.
+Zapisy mocy wymagają podania limitu instalacji w opcjach integracji;
+ustawienia serwisowe i wybór EMS są domyślnie wyłączone.
+Wybór EMS nie zastępuje zewnętrznego sterownika EMS.
+[Pełny opis, zasady zapisu i ograniczenia](docs/CONTROLS.md).

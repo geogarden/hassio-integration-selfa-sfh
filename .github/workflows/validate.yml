@@ -293,3 +293,52 @@ jobs:
           fi
           gh release create v2.2.7 selfa-sfh-2.2.7.zip selfa-sfh-2.2.7.zip.sha256 \
             --target "$SOURCE_SHA" --title "Selfa SFH 2.2.7" --notes-file release-notes.md --latest
+
+  release_2_3_0:
+    needs: test
+    if: >-
+      github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.head_commit.message == 'Release 2.3.0: confirmed controls and six-period battery schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      SOURCE_SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare source archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -c 'import json; assert json.load(open("custom_components/selfa_sfh/manifest.json"))["version"] == "2.3.0"'
+          git archive --format=zip HEAD custom_components/selfa_sfh > selfa-sfh-2.3.0.zip
+          unzip -t selfa-sfh-2.3.0.zip
+          sha256sum selfa-sfh-2.3.0.zip > selfa-sfh-2.3.0.zip.sha256
+          cat > release-notes.md <<'NOTES'
+          ## Selfa SFH 2.3.0
+
+          - Zapis trybu pracy, UPS, limitu eksportu, ochrony i progów SOC.
+          - Edycja 6 okresów harmonogramu: aktywność, źródło, działanie, limit mocy i godziny.
+          - Sterowanie mocą AC/PV/baterii i ustawienia serwisowe; potwierdzenie zapisów odczytem.
+          - Synchronizacja zegara i polecenia serwisowe WO bez fikcyjnego potwierdzenia stanu.
+          - Opisy błędów oraz zachowane dotychczasowe odczyty, identyfikatory i panel mini.
+          - Zapisy mocy wymagają ustawienia limitu instalacji w opcjach integracji (domyślnie 0).
+          - Ustawienia serwisowe i wybór EMS są domyślnie wyłączone. Wybór EMS nie implementuje zewnętrznego EMS ani emulacji BMS/licznika.
+          - Kod sieci i napięcie off-grid pozostają tylko do odczytu. Dokumentacja: docs/CONTROLS.md.
+          - Testy na lokalnym symulatorze Modbus i rzeczywistych platformach HA; bez fizycznego testu zapisu na falowniku.
+
+          Aktualizacja: HACS → Selfa SFH → aktualizuj do 2.3.0 i uruchom ponownie Home Assistant. Nowe sterowanie jest dostępne w encjach integracji.
+          Paczka ZIP zawiera custom_components/selfa_sfh do instalacji ręcznej.
+          NOTES
+      - name: Publish tested release
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view v2.3.0 >/dev/null 2>&1; then
+            echo 'Release already exists.'
+            exit 0
+          fi
+          gh release create v2.3.0 selfa-sfh-2.3.0.zip selfa-sfh-2.3.0.zip.sha256 \
+            --target "$SOURCE_SHA" --title "Selfa SFH 2.3.0" --notes-file release-notes.md --latest

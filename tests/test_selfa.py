@@ -228,7 +228,7 @@ async def test_setup_and_unload_lifecycle(hass, gateway):
         ),
     ):
         assert await async_setup_entry(hass, entry)
-        assert len(forward.call_args.args[1]) == 4
+        assert len(forward.call_args.args[1]) == 7
         assert "ems" not in forward.call_args.args[1]
         assert await async_unload_entry(hass, entry)
 
@@ -259,9 +259,22 @@ async def test_real_home_assistant_platform_setup(hass, gateway, tmp_path):
     await hass.async_block_till_done()
     assert entry.state.value == "loaded"
     states = [state for state in hass.states.async_all() if "selfa_key" in state.attributes]
-    assert len(states) == 183
+    assert len(states) > 183
     assert next(state for state in states if state.attributes["selfa_key"] == "soc").state == "87.5"
     assert all(req[0] == 3 for req in gateway.requests)
+    assert any(state.entity_id.startswith("select.") and state.attributes.get("selfa_key") == "operating_mode" for state in states)
+    assert any(state.entity_id.startswith("time.") and state.attributes.get("selfa_key") == "period_1_start" for state in states)
+    assert any(state.entity_id.startswith("number.") and state.attributes.get("selfa_key") == "on_grid_end_soc" for state in states)
+    mode = next(state for state in states if state.entity_id.startswith("select.") and state.attributes.get("selfa_key") == "operating_mode")
+    await hass.services.async_call("select", "select_option", {"entity_id": mode.entity_id, "option": "economic"}, blocking=True)
+    assert gateway.words[50000] == 0x0102
+    soc_control = next(state for state in states if state.entity_id.startswith("number.") and state.attributes.get("selfa_key") == "on_grid_end_soc")
+    await hass.services.async_call("number", "set_value", {"entity_id": soc_control.entity_id, "value": 25.5}, blocking=True)
+    assert gateway.words[52503] == 255
+    assert hass.states.get(soc_control.entity_id).state == "25.5"
+    start_control = next(state for state in states if state.entity_id.startswith("time.") and state.attributes.get("selfa_key") == "period_1_start")
+    await hass.services.async_call("time", "set_value", {"entity_id": start_control.entity_id, "time": "01:30:00"}, blocking=True)
+    assert gateway.words[53012] == 0x011E
     coordinator = entry.runtime_data
     assert await hass.config_entries.async_unload(entry.entry_id)
     assert coordinator.client._client is None
